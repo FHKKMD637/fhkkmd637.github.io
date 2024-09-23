@@ -26,7 +26,7 @@
 <meta property="og:site_name" content="FHK_KMD终晨">
 <meta property="og:description" content="Server-side request forgery is a web security vulnerability that allows an attacker to cause the server-side application to make requests to an unintended location.就是伪造成服务端 Basic SSRF against the loca">
 <meta property="og:locale">
-<meta property="og:image" content="http://example.com/attachment/Pasted%20image%2020240514153559.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240514153559.png">
 <meta property="og:image" content="http://example.com/attachment/Pasted%20image%2020240514153633.png">
 <meta property="og:image" content="http://example.com/attachment/Pasted%20image%2020240514153653.png">
 <meta property="og:image" content="http://example.com/attachment/Pasted%20image%2020240514153910.png">
@@ -85,10 +85,10 @@
 <meta property="og:image" content="http://example.com/attachment/Pasted%20image%2020240611010923.png">
 <meta property="og:image" content="http://example.com/attachment/Pasted%20image%2020240611011846.png">
 <meta property="article:published_time" content="2024-09-23T12:58:35.839Z">
-<meta property="article:modified_time" content="2024-09-23T12:58:35.840Z">
+<meta property="article:modified_time" content="2024-09-23T13:10:50.807Z">
 <meta property="article:author" content="FHK_KMD6377">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/attachment/Pasted%20image%2020240514153559.png">
+<meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240514153559.png">
   
   
   
@@ -335,16 +335,13 @@
               <div class="markdown-body">
                 
                 <p>Server-side request forgery is a web security vulnerability that allows an attacker to cause the server-side application to make requests to an unintended location.<br>就是伪造成服务端</p>
-<h3 id="Basic-SSRF-against-the-local-server"><a href="#Basic-SSRF-against-the-local-server" class="headerlink" title="Basic SSRF against the local server"></a><a target="_blank" rel="noopener" href="https://portswigger.net/web-security/ssrf/lab-basic-ssrf-against-localhost">Basic SSRF against the local server</a></h3><p><img src="/attachment/Pasted%20image%2020240514153559.png" srcset="/img/loading.gif" lazyload><br>这里有一个check stock检查库存的功能<br>数据包是这样的<br><img src="/attachment/Pasted%20image%2020240514153633.png" srcset="/img/loading.gif" lazyload><br>通过url解码可以看到<code>stockApi</code>是<img src="/attachment/Pasted%20image%2020240514153653.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="Basic-SSRF-against-the-local-server"><a href="#Basic-SSRF-against-the-local-server" class="headerlink" title="Basic SSRF against the local server"></a><a target="_blank" rel="noopener" href="https://portswigger.net/web-security/ssrf/lab-basic-ssrf-against-localhost">Basic SSRF against the local server</a></h3><p><img src="/images/Pasted%20image%2020240514153559.png" srcset="/img/loading.gif" lazyload><br>这里有一个check stock检查库存的功能<br>数据包是这样的<br><img src="/attachment/Pasted%20image%2020240514153633.png" srcset="/img/loading.gif" lazyload><br>通过url解码可以看到<code>stockApi</code>是<img src="/attachment/Pasted%20image%2020240514153653.png" srcset="/img/loading.gif" lazyload></p>
 <p>为什么会有这个stockApi呢?</p>
 <blockquote>
 <p>例如，假设有一个购物应用程序，它允许用户查看某个商店中某件商品是否有货。为了提供库存信息，该应用程序必须查询各种后端 REST API。它通过前端 HTTP 请求将 URL 传递到相关的后端 API 端点来实现这一点。当用户查看某件商品的库存状态时，他们的浏览器会发出以下请求：</p>
 </blockquote>
-<pre><code>POST /product/stock HTTP/1.0 
-Content-Type: application/x-www-form-urlencoded 
-Content-Length: 118 
-stockApi=http://stock.weliketoshop.net:8080/product/stock/check%3FproductId%3D6%26storeId%3D1
-</code></pre>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">POST</span> /product/stock HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">0</span> <br><span class="hljs-attribute">Content</span>-Type: application/x-www-form-urlencoded <br><span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">118</span> <br><span class="hljs-attribute">stockApi</span>=http://stock.weliketoshop.net:<span class="hljs-number">8080</span>/product/stock/check%<span class="hljs-number">3</span>FproductId%<span class="hljs-number">3</span>D6%<span class="hljs-number">26</span>storeId%<span class="hljs-number">3</span>D1<br></code></pre></td></tr></table></figure>
+
 <blockquote>
 <p>这会导致服务端向特定的url发送一个请求取回库存的状态, 再返回给用户</p>
 </blockquote>
@@ -398,16 +395,11 @@ stockApi=http://stock.weliketoshop.net:8080/product/stock/check%3FproductId%3D6%
 <p>URL规范包含许多特性，当URL使用此方法实现特别解析和验证时，这些特性可能会被忽略:<br>&#x3D;&#x3D;The URL specification contains a number of features that are likely to be overlooked when URLs implement ad-hoc parsing and validation using this method: &#x3D;&#x3D;</p>
 </blockquote>
 <ul>
-<li><p>你可以在主机名前面使用<code>@</code>嵌入证书&#x3D;&#x3D;You can embed credentials in a URL before the hostname, using the <code>@</code> character&#x3D;&#x3D;.<br>  For example:<code>https://expected-host:fakepassword@evil-host</code><br>  没找到资料, 我估计前面的是一种类似于登录的</p>
-</li>
-<li><p>使用<code>#</code>来指示URL的分段&#x3D;&#x3D;You can use the <code>#</code> character to indicate a URL fragment. For example:&#x3D;&#x3D;<br>  <code>https://evil-host#expected-host</code><br>  <a href="obsidian://open?vault=xiaod.web&file=%E5%85%B3%E4%BA%8Eurl%E4%B8%AD%EF%BC%83%E7%9A%84%E4%BD%9C%E7%94%A8">关于url中<code>#</code>的作用</a>  </p>
-</li>
-<li><p>可以利用 DNS 命名层次结构来放置你控制的充分认证后的DNS名。&#x3D;&#x3D;You can leverage the DNS naming hierarchy to place required input into a fully-qualified DNS name that you control. For example:&#x3D;&#x3D;<br>  <code>https://expected-host.evil-host</code></p>
-</li>
-<li><p>您可以对字符进行 URL 编码，以混淆 URL 解析代码。如果实现过滤器的代码处理 URL 编码字符的方式与执行后端 HTTP 请求的代码不同，则此功能特别有用。您还可以尝试对字符进行双重编码；某些服务器会递归对输入进行 URL 解码, 从而导致进一步的差异&#x3D;&#x3D;You can URL-encode characters to confuse the URL-parsing code. This is particularly useful if the code that implements the filter handles URL-encoded characters differently than the code that performs the back-end HTTP request. You can also try <a target="_blank" rel="noopener" href="https://portswigger.net/web-security/essential-skills/obfuscating-attacks-using-encodings#obfuscation-via-double-url-encoding">double-encoding</a> characters; some servers recursively URL-decode the input they receive, which can lead to further discrepancies.&#x3D;&#x3D;</p>
-</li>
-<li><p>You can use combinations of these techniques together.</p>
-</li>
+<li>你可以在主机名前面使用<code>@</code>嵌入证书&#x3D;&#x3D;You can embed credentials in a URL before the hostname, using the <code>@</code> character&#x3D;&#x3D;.<br>For example:<code>https://expected-host:fakepassword@evil-host</code><br>没找到资料, 我估计前面的是一种类似于登录的</li>
+<li>使用<code>#</code>来指示URL的分段&#x3D;&#x3D;You can use the <code>#</code> character to indicate a URL fragment. For example:&#x3D;&#x3D;<br><code>https://evil-host#expected-host</code><br><a href="obsidian://open?vault=xiaod.web&file=%E5%85%B3%E4%BA%8Eurl%E4%B8%AD%EF%BC%83%E7%9A%84%E4%BD%9C%E7%94%A8">关于url中<code>#</code>的作用</a></li>
+<li>可以利用 DNS 命名层次结构来放置你控制的充分认证后的DNS名。&#x3D;&#x3D;You can leverage the DNS naming hierarchy to place required input into a fully-qualified DNS name that you control. For example:&#x3D;&#x3D;<br><code>https://expected-host.evil-host</code></li>
+<li>您可以对字符进行 URL 编码，以混淆 URL 解析代码。如果实现过滤器的代码处理 URL 编码字符的方式与执行后端 HTTP 请求的代码不同，则此功能特别有用。您还可以尝试对字符进行双重编码；某些服务器会递归对输入进行 URL 解码, 从而导致进一步的差异&#x3D;&#x3D;You can URL-encode characters to confuse the URL-parsing code. This is particularly useful if the code that implements the filter handles URL-encoded characters differently than the code that performs the back-end HTTP request. You can also try <a target="_blank" rel="noopener" href="https://portswigger.net/web-security/essential-skills/obfuscating-attacks-using-encodings#obfuscation-via-double-url-encoding">double-encoding</a> characters; some servers recursively URL-decode the input they receive, which can lead to further discrepancies.&#x3D;&#x3D;</li>
+<li>You can use combinations of these techniques together.</li>
 </ul>
 <p>还是这个靶场, 管理页面是这个<code>http://localhost/admin</code><br>检查库存<br><img src="/attachment/Pasted%20image%2020240629182021.png" srcset="/img/loading.gif" lazyload><br><img src="/attachment/Pasted%20image%2020240630022411.png" srcset="/img/loading.gif" lazyload></p>
 <p><code>stockApi=http://stock.weliketoshop.net:8080/product/stock/check?productId=1&amp;storeId=1</code><br>这个靶场是有白名单的, 所以类似于<code>http://localhost/admin</code>这种是不允许访问的<br>检查器必须要检查是<code>stock.weliketoshop.net</code>这个域名才会放行<br>用@这种方式, 假装是以用户名进行访问<br><code>stockApi=http://username@stock.weliketoshop.net</code></p>
@@ -435,17 +427,8 @@ stockApi=http://stock.weliketoshop.net:8080/product/stock/check%3FproductId%3D6%
 <p>这个命令执行后，首先输出<code>shellshocked</code>，然后是<code>echo hi</code>命令的结果，即<code>hi</code>。</p>
 <h3 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h3><p>口语化阐释一下漏洞原理：<code>父进程中的特殊变量字符串(这里指字符串内容为函数)成为环境变量后，在子进程中调用该字符串时将其理解为函数执行</code></p>
 <p>在<code>shell</code>中函数定义：<a target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-shell-func.html">https://www.runoob.com/linux/linux-shell-func.html</a></p>
-<pre><code class="bash">#!/bin/bash
-# author:菜鸟教程
-# url:www.runoob.com
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-comment"># author:菜鸟教程</span><br><span class="hljs-comment"># url:www.runoob.com</span><br><br><span class="hljs-function"><span class="hljs-title">demoFun</span></span>()&#123;<br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;这是我的第一个 shell 函数!&quot;</span><br>&#125;<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;-----函数开始执行-----&quot;</span><br>demoFun<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;-----函数执行完毕-----&quot;</span><br></code></pre></td></tr></table></figure>
 
-demoFun()&#123;
-    echo &quot;这是我的第一个 shell 函数!&quot;
-&#125;
-echo &quot;-----函数开始执行-----&quot;
-demoFun
-echo &quot;-----函数执行完毕-----&quot;
-</code></pre>
 <p>在<code>shell</code>中定义变量<br><code>springbird=&quot;hi&quot;</code></p>
 <p>使用<code>echo</code>输出</p>
 <p><a target="_blank" rel="noopener" href="https://springbird.oss-cn-beijing.aliyuncs.com/blog20210105115013.png"><img src="https://springbird.oss-cn-beijing.aliyuncs.com/blog20210105115013.png" srcset="/img/loading.gif" lazyload></a></p>
@@ -483,13 +466,13 @@ echo &quot;-----函数执行完毕-----&quot;
 <p>从上面的分析中可以看出，漏洞的根本原因存在于Bash的ENV命令实现上，因此漏洞本身是不能够直接导致远程代码执行的。如果要达到远程代码执行的目的，必须借助第三方服务程序作为媒介才能够实现，第三方服务程序也必须要满足众多条件才可以充当此媒介的角色。</p>
 <p>该<code>Bash</code>使用的环境变量是通过函数名称来调用的，导致漏洞出问题是以<code>()&#123;</code>开头定义的环境变量在命令<code>ENV</code>中解析成函数后，<code>Bash</code>执行并未退出，而是继续解析并执行shell命令。而其核心的原因在于在输入的过滤中没有严格限制边界，也没有做出合法化的参数判断。</p>
 <h3 id="web漏洞检测"><a href="#web漏洞检测" class="headerlink" title="web漏洞检测"></a>web漏洞检测</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Cl0ud/p/14248937.html">Bash 破壳漏洞Shellshock （CVE-2014-6271）复现分析 - 春告鳥 - 博客园 (cnblogs.com)</a><br>启动vulhub靶场—-Bash Shellshock 破壳漏洞（CVE-2012-6271）(搭建这个b玩意搞端口转发花了我一个多小时)<br>编译运行：</p>
-<pre><code>docker compose up -d
-</code></pre>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">docker compose up -d</span><br></code></pre></td></tr></table></figure>
+
 <p>服务启动后，有两个页面<code>http://your-ip:8080/victim.cgi</code>和<code>http://your-ip:8080/safe.cgi</code>。其中safe.cgi是最新版bash生成的页面，victim.cgi是bash4.3生成的页面。</p>
 <p>其中数据包原本是这样的<br><img src="/attachment/Pasted%20image%2020240611001752.png" srcset="/img/loading.gif" lazyload></p>
 <p>将payload附在User-Agent中访问victim.cgi：</p>
-<pre><code>User-Agent: () &#123; foo; &#125;; echo Content-Type: text/plain; echo; /usr/bin/id
-</code></pre>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sqf">User-<span class="hljs-built_in">Agent</span>: () &#123; foo; &#125;; <span class="hljs-built_in">echo</span> Content-<span class="hljs-built_in">Type</span>: <span class="hljs-built_in">text</span>/plain; <span class="hljs-built_in">echo</span>; /usr/bin/id<br></code></pre></td></tr></table></figure>
+
 <p>命令成功被执行：<br><img src="/attachment/Pasted%20image%2020240611003037.png" srcset="/img/loading.gif" lazyload><br>同样的数据包访问safe.cgi，不受影响：<br><img src="/attachment/Pasted%20image%2020240611003107.png" srcset="/img/loading.gif" lazyload></p>
 <p>当然这个漏洞也可以执行别的命令比如说<code>cat /etc/passwd</code><br><img src="/attachment/Pasted%20image%2020240611003449.png" srcset="/img/loading.gif" lazyload></p>
 <h3 id="开始正题"><a href="#开始正题" class="headerlink" title="开始正题"></a>开始正题</h3><p>访问靶场<a target="_blank" rel="noopener" href="https://portswigger.net/web-security/ssrf/blind/lab-shellshock-exploitation">Lab: Blind SSRF with Shellshock exploitation | Web Security Academy (portswigger.net)</a><br>靶场说, 该网站使用分析软件，当加载产品页面时，该软件会获取Referer标头中指定的URL。<br>所以我们要在referer头中插入我们想让它访问的网站, 也就是内部网络中<code>192.168.0.X:8080</code>的管理界面</p>
