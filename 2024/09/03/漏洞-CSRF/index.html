@@ -1,0 +1,667 @@
+
+
+<!DOCTYPE html>
+<html lang="zh" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="FHK_KMD6377">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="漏洞-CSRF跨站请求伪造（CSRF）是一种冒充受信任用户，向服务器发送非预期请求的攻击方式。你可以这么来理解：攻击者盗用了你的身份，以你的名义发送恶意请求，对服务器来说这个请求是完全合法的，但是却完成了攻击者所期望的一个操作，比如以你的名义更改绑定的邮箱,  发送邮件、发消息，盗取你的账号，添加系统管理员，甚至于购买商品、虚拟货币转账等正常情况是向真网站发送请求更改密码, 现在如果进入了假网站也">
+<meta property="og:type" content="article">
+<meta property="og:title" content="漏洞-CSRF 639">
+<meta property="og:url" content="http://example.com/2024/09/03/%E6%BC%8F%E6%B4%9E-CSRF/index.html">
+<meta property="og:site_name" content="FHK_KMD终晨">
+<meta property="og:description" content="漏洞-CSRF跨站请求伪造（CSRF）是一种冒充受信任用户，向服务器发送非预期请求的攻击方式。你可以这么来理解：攻击者盗用了你的身份，以你的名义发送恶意请求，对服务器来说这个请求是完全合法的，但是却完成了攻击者所期望的一个操作，比如以你的名义更改绑定的邮箱,  发送邮件、发消息，盗取你的账号，添加系统管理员，甚至于购买商品、虚拟货币转账等正常情况是向真网站发送请求更改密码, 现在如果进入了假网站也">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240310093827.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240310102359.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240310102550.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240310103213.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311002257%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311002625%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311002738%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311002858%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311002803%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311004002%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311004045%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311232437%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311234908%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240311232947%201.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312170144.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312170820.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312172114.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312172631.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312173239.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312173307.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312173503.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312174816.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312175436.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312180224.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312180334.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312180953.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312234403.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240312234740.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240315185617.png">
+<meta property="article:published_time" content="2024-09-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-09-25T04:31:17.133Z">
+<meta property="article:author" content="FHK_KMD6377">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240310093827.png">
+  
+  
+  
+  <title>漏洞-CSRF 639 - FHK_KMD终晨</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FHK_KMD&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archivo</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categorías</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Etiquetas</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>Acerca</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="漏洞-CSRF 639"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-09-03 00:00" pubdate>
+          September 3, 2024 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k palabras
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 minutos
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">漏洞-CSRF 639</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="漏洞-CSRF"><a href="#漏洞-CSRF" class="headerlink" title="漏洞-CSRF"></a>漏洞-CSRF</h1><p>跨站请求伪造（CSRF）是一种冒充受信任用户，向服务器发送非预期请求的攻击方式。<br>你可以这么来理解：攻击者盗用了你的身份，以你的名义发送恶意请求，对服务器来说这个请求是完全合法的，但是却完成了攻击者所期望的一个操作，比如以你的名义更改绑定的邮箱,  发送邮件、发消息，盗取你的账号，添加系统管理员，甚至于购买商品、虚拟货币转账等<br><img src="/images/Pasted%20image%2020240310093827.png" srcset="/img/loading.gif" lazyload><br>正常情况是向真网站发送请求更改密码, 现在如果进入了假网站也向百度服务器发送更改密码的请求, 那么这个加请求会附带上所在浏览器的COOKIE, 就会被当作是真正的用户的行为</p>
+<h3 id="CSRF-vulnerability-with-no-defenses"><a href="#CSRF-vulnerability-with-no-defenses" class="headerlink" title="CSRF vulnerability with no defenses"></a><a target="_blank" rel="noopener" href="https://portswigger.net/web-security/csrf">CSRF vulnerability</a> with no defenses</h3><p>打开真网站,选择更改邮箱为<a href="mailto:&#x36;&#51;&#55;&#x36;&#51;&#x39;&#x40;&#70;&#72;&#x4b;&#46;&#101;&#x6d;&#x69;&#x61;&#x6c;">&#x36;&#51;&#55;&#x36;&#51;&#x39;&#x40;&#70;&#72;&#x4b;&#46;&#101;&#x6d;&#x69;&#x61;&#x6c;</a>,比如,输入邮箱地址,抓这个更改邮箱的数据包<br><img src="/images/Pasted%20image%2020240310102359.png" srcset="/img/loading.gif" lazyload><br>右键 -&gt; Engagement tools -&gt; Generate CSRF PoC<br>这样就得到了一个伪造的html页面<br><img src="/images/Pasted%20image%2020240310102550.png" srcset="/img/loading.gif" lazyload><br>这个html的逻辑是,有两个表单,一个是隐藏的,一个是一个提交的输入框,但是只要打开这个页面就执行了js代码,把表单数据发送出去<br>注意要把这里的value改成exploit也就是攻击者自己的邮箱<br><img src="/images/Pasted%20image%2020240310103213.png" srcset="/img/loading.gif" lazyload><br>然后copy html,把这个放到恶意服务器构造的恶意网页上.再把这个网页发送给受害者.<br>受害者登录自己的账号之后再打开这网页, js代码执行. 结果会导致受害者账号绑定的邮箱被恶意改成攻击者的 </p>
+<h3 id="CSRF-where-token-validation-depends-on-request-method"><a href="#CSRF-where-token-validation-depends-on-request-method" class="headerlink" title="CSRF where token validation depends on request method"></a>CSRF where token validation depends on request method</h3><p>This lab’s email change functionality is vulnerable to CSRF. It attempts to block CSRF attacks, but only applies defenses to certain types of requests.<br>只会对特定的请求方式拦截CSRF<br>还是按照上一个那个方式进行抓包<br><img src="/images/Pasted%20image%2020240311002257%201.png" srcset="/img/loading.gif" lazyload><br>#csrf_tocken 这回很明显多了一个crsf的校验参数</p>
+<p>但是如果他只对POST请求做了这个限制呢?<br>发送到 repeater模块,然后change request method<br><img src="/images/Pasted%20image%2020240311002625%201.png" srcset="/img/loading.gif" lazyload><br>发现使用GET请求在不加csrf这个参数的情况下也可以过<br><img src="/images/Pasted%20image%2020240311002738%201.png" srcset="/img/loading.gif" lazyload><br>注意这时候返回了一个302重定向<br><img src="/images/Pasted%20image%2020240311002858%201.png" srcset="/img/loading.gif" lazyload><br>继续跟进的话就成功返回了响应的页面<br><img src="/images/Pasted%20image%2020240311002803%201.png" srcset="/img/loading.gif" lazyload><br>注意此时这个返回值状态码200对应的GET请求不是更改邮箱的那个请求了(那个的返回状态码是302),故制作CRSF页面的时候要返回到上一个页面去制作</p>
+<h3 id="CSRF-where-token-validation-depends-on-token-being-present"><a href="#CSRF-where-token-validation-depends-on-token-being-present" class="headerlink" title="CSRF where token validation depends on token being present"></a>CSRF where token validation depends on token being present</h3><p>这种情况是只有在csrf这个token存在的时候才会做校验(应该属于是网站管理者的bug)<br>也是和上面一样,抓取更改邮箱的包<br><img src="/images/Pasted%20image%2020240311004002%201.png" srcset="/img/loading.gif" lazyload><br>如果不知道这个crsf参数(上面这值是我随便填的), 得到400<br>而此时删掉crsf参数再发送<br><img src="/images/Pasted%20image%2020240311004045%201.png" srcset="/img/loading.gif" lazyload><br>得到了和上一种一样的情况,那么就可以还是以这个请求来做csrf的页面</p>
+<h3 id="CSRF-where-token-is-not-tied-to-user-session"><a href="#CSRF-where-token-is-not-tied-to-user-session" class="headerlink" title="CSRF where token is not tied to user session"></a>CSRF where token is not tied to user session</h3><p>It uses tokens to try to prevent CSRF attacks, but they aren’t integrated into the site’s session handling system.<br>这种情况是,在网站的逻辑中,用户的session id和服务器下发的csrf参数token并不是绑定的(比如它可能会隔一段时间变一下,或者每次访问都会变一下)<br>那么就可以通过抓包的方式获取到下一次访问时的csrf token,然后把包丢弃,不触发服务器改变token的操作,从而伪造成正常用户</p>
+<p>#token 指的是用来校验数据包的一个参数,在这里指http数据包中POST请求体的csrf参数</p>
+<ul>
+<li>实操(这个实例是每次访问都会改变token; 所以关键是获取到新鲜的没有被发出去的token)<br>先用正常的账号登录,更改邮箱,抓包(注意此时拦截要一直开着)<br><img src="/images/Pasted%20image%2020240311232437%201.png" srcset="/img/loading.gif" lazyload><br>然后将csrf token保存下来, <strong>丢弃(drop)这个包</strong>.不要发给服务器 &#x2F;&#x2F;因为一旦发出去了,token就会改变,那么现在拦截到的token就失效了<br>注意还不能关掉拦截<br>打开[浏览器的隐私窗口],登录另一个账号再次操作更改邮箱,再次抓包<br><img src="/images/Pasted%20image%2020240311234908%201.png" srcset="/img/loading.gif" lazyload><br>此时如果把这个csrf参数换成之前保存的那个,发现可以成功访问.<br>但此时这个token已经用过了,所以失效了<br>遂还是按照 <strong>更改邮箱,抓包,保存token,丢包的步骤</strong> 获取新的token<br>然后随便找一个更改邮箱的数据包<br>右键 -&gt; Engagement tools -&gt; Generate CSRF PoC<br>把csrf的参数改成新的那个token,即可得到csrf的html页面<br><img src="/images/Pasted%20image%2020240311232947%201.png" srcset="/img/loading.gif" lazyload></li>
+</ul>
+<h3 id="CSRF-where-token-is-tied-to-non-session-cookie"><a href="#CSRF-where-token-is-tied-to-non-session-cookie" class="headerlink" title="CSRF where token is tied to non-session cookie"></a>CSRF where token is tied to non-session cookie</h3><p>This lab’s email change functionality is vulnerable to CSRF. It uses tokens to try to prevent CSRF attacks, but they aren’t fully integrated into the site’s session handling system.<br><a target="_blank" rel="noopener" href="https://portswigger.net/web-security/csrf/bypassing-token-validation/lab-token-tied-to-non-session-cookie">靶场地址</a><br>登录, 更改邮箱, 抓包<br><img src="/images/Pasted%20image%2020240312170144.png" srcset="/img/loading.gif" lazyload><br>会发现现在网站的逻辑进一步升级, 不仅在POST请求体中加入了csrf参数, 而且在Cookie请求头中加入了一个叫csrfKey参数的东西<br>发送到repeater模块<br><img src="/images/Pasted%20image%2020240312170820.png" srcset="/img/loading.gif" lazyload><br>如果更改csrf参数或者csrfKey都会导致返回”Invalid CSRF token”<br>而如果改变session就会退出登录让你重新登录<br>猜测这里的csrf和csrfKey和session无关</p>
+<p>————————-支线1——————————————-<br>再次更改邮箱,打开拦截抓包,保存csrf和csrfKey,丢包<br>打开一个浏览器隐私窗口,登录另一个账号,更改邮箱,抓包<br><img src="/images/Pasted%20image%2020240312172114.png" srcset="/img/loading.gif" lazyload><br>把csrf和csrfKey参数全部改成上次保存的, 放包, 发现一切正常.  说明这里csrf和csrfKey还是和session无关</p>
+<hr>
+<p>所以还是和上一个一样的思路</p>
+<ul>
+<li>现在问题来了, 生成CSRF Poc的时候,<br><img src="/images/Pasted%20image%2020240312172631.png" srcset="/img/loading.gif" lazyload><br>这里的js代码的逻辑只能影响到csrf, 而无法更改Cookie请求头中的csrfKey<br>所以这个网页是不成功的. 暂时搁置<br>现在转到其他地方看看有没有别的漏洞</li>
+</ul>
+<p>偶然发现, 如果在网站搜索框里搜一些东西, 比如这里搜索123<br><img src="/images/Pasted%20image%2020240312173239.png" srcset="/img/loading.gif" lazyload><br>找到发送搜索请求的数据包<br><img src="/images/Pasted%20image%2020240312173307.png" srcset="/img/loading.gif" lazyload><br>返回的响应头参数里有一个Set-Cookie<br>查找文档发现,这个东西可以更改用户端Cookie<br><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie#%E5%B1%9E%E6%80%A7">Set-Cookie - HTTP | MDN 官方文档</a><br><img src="/images/Pasted%20image%2020240312173503.png" srcset="/img/loading.gif" lazyload><br>将搜索的数据包发送到repeater模块, 把?search参数的值改为<code>1;%0D%0ASet-Cookie:%20csrfKey=abcd</code><br><img src="/images/Pasted%20image%2020240312174816.png" srcset="/img/loading.gif" lazyload><br>现在, 神奇的事情发生了, 相应数据多了一个Set-Cookie, 并且将csrfKey设置成了abcd</p>
+<p>解释一下为什么是这个<code>1;%0D%0ASet-Cookie:%20csrfKey=abcd</code><br>首先, 在1后面加上<code>;</code>来闭合上一个Set-Cookie       &#x2F;&#x2F;因为Set-Cookie每次只能设置一个值, 要发送多个 cookie，则应在同一响应中发送多个 <strong><code>Set-Cookie</code></strong> 标头。<br>然后这个%0D%0A是表示换行的字符俩(<code>\r\n</code>也即creturn和linefeed)的url编码<br><img src="/images/Pasted%20image%2020240312175436.png" srcset="/img/loading.gif" lazyload><br>其次这个%20是空格的url编码</p>
+<p>现在更改了cookie之后,再次访问别的地方,发现这个新增的cookie可以一直存在<br>在这里右键-&gt;copy url<br><img src="/images/Pasted%20image%2020240312180224.png" srcset="/img/loading.gif" lazyload><br>如果有谁访问了这个url的话, 那么他的cookie就会新增一个csrfKey<br>回到之前那个生成CSRF Poc的地方<br><img src="/images/Pasted%20image%2020240312180334.png" srcset="/img/loading.gif" lazyload><br>现在要对这个html进行改造, 使得受害者先访问那个保存的url以更改掉cookie, 再提交一个POST请求更改邮箱<br><img src="/images/Pasted%20image%2020240312180953.png" srcset="/img/loading.gif" lazyload></p>
+<ul>
+<li>注意这里的csrf和csrfKey的值都要再通过抓包丢包获取一遍以确保是可用的<br>这里的js的img标签会先访问这个url,发现不是图片,进入onerror,执行发包的操作</li>
+</ul>
+<p>现在还差最后一步, 那就是给cookie加一个属性SameSite&#x3D;None<br>因为Set-Cookie标头有一个用于控制这个cookie是否跨站发送的属性[SameSite](<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie#%E5%B1%9E%E6%80%A7">Set-Cookie - HTTP | MDN (mozilla.org)</a>)<br>以下是关于这个属性的MDN文档介绍<br><img src="/images/Pasted%20image%2020240312234403.png" srcset="/img/loading.gif" lazyload><br>设置语法是<br><img src="/images/Pasted%20image%2020240312234740.png" srcset="/img/loading.gif" lazyload><br>故而最终search参数的payload是<br><code>1; </code>Set-Cookie: csrfKey&#x3D;相应的值; SameSite&#x3D;None&#96;</p>
+<p>转化为url编码&#x3D;&gt;<br><code>1;%0d%0aSet-Cookie%3a%20csrfKey=相应的值%3b%20SameSite%3dNone</code><br>所以最后的html页面是<br><img src="/images/Pasted%20image%2020240315185617.png" srcset="/img/loading.gif" lazyload><br>{整个实验下来的csrf和csrfKey具体的值可能变了很多次, 但是关系不大, 经过测试, 这个实例中任何一个成功访问的csrf和csrfKey都是可以复用的}</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>漏洞-CSRF 639</div>
+      <div>http://example.com/2024/09/03/漏洞-CSRF/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Autor</div>
+          <div>FHK_KMD6377</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Publicado el</div>
+          <div>September 3, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licencia bajo</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Atribución">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/09/03/%E6%BC%8F%E6%B4%9E-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" title="漏洞-文件包含 639">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">漏洞-文件包含 639</span>
+                        <span class="visible-mobile">Anterior</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Tabla de Contenidos</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Buscar</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Palabra clave</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">El blog funciona mejor con JavaScript habilitado</div>
+  </noscript>
+</body>
+</html>

