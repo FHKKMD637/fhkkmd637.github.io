@@ -19,17 +19,17 @@
   <meta name="author" content="FHK_KMD6377">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言首先我们先讲解下什么是模板引擎，为什么需要模板？模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。 模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码）这项工作的一">
+    <meta name="description" content="漏洞-SSTI前言首先我们先讲解下什么是模板引擎，为什么需要模板？模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。 模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码">
 <meta property="og:type" content="article">
 <meta property="og:title" content="FHK_KMD终晨">
 <meta property="og:url" content="http://example.com/2024/09/23/%E6%BC%8F%E6%B4%9E-SSTI/index.html">
 <meta property="og:site_name" content="FHK_KMD终晨">
-<meta property="og:description" content="前言首先我们先讲解下什么是模板引擎，为什么需要模板？模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。 模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码）这项工作的一">
+<meta property="og:description" content="漏洞-SSTI前言首先我们先讲解下什么是模板引擎，为什么需要模板？模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。 模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码">
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/images/Pasted%20image%2020240918005926.png">
 <meta property="og:image" content="http://example.com/images/Pasted%20image%2020240918010001.png">
 <meta property="article:published_time" content="2024-09-23T13:13:42.810Z">
-<meta property="article:modified_time" content="2024-09-23T13:13:42.810Z">
+<meta property="article:modified_time" content="2024-09-25T04:19:36.780Z">
 <meta property="article:author" content="FHK_KMD6377">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/images/Pasted%20image%2020240918005926.png">
@@ -278,7 +278,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先我们先讲解下什么是模板引擎，为什么需要模板？<br>模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。</p>
+                <h1 id="漏洞-SSTI"><a href="#漏洞-SSTI" class="headerlink" title="漏洞-SSTI"></a>漏洞-SSTI</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先我们先讲解下什么是模板引擎，为什么需要模板？<br>模板引擎可以让（网站）程序实现界面与数据分离，业务代码与逻辑代码的分离，这大大提升了开发效率，良好的设计也使得代码重用变得更加容易。但是往往新的开发都会导致一些安全问题，虽然模板引擎会提供沙箱机制，但同样存在沙箱逃逸技术来绕过。</p>
 <p>模板只是一种提供给程序来解析的一种语法，换句话说，模板是用于从数据（变量）到实际的视觉表现（HTML代码）这项工作的一种实现手段，而这种手段不论在前端还是后端都有应用。</p>
 <p>后端渲染：浏览器会直接接收到经过服务器计算之后的呈现给用户的最终的HTML字符串，计算就是服务器后端经过解析服务器端的模板来完成的，后端渲染的好处是对前端浏览器的压力较小，主要任务在服务器端就已经完成。</p>
 <p>前端渲染：前端渲染相反，是浏览器从服务器得到信息，可能是json等数据包封装的数据，也可能是html代码，他都是由浏览器前端来解析渲染成html的人们可视化的代码而呈现在用户面前，好处是对于服务器后端压力较小，主要渲染在用户的客户端完成。</p>

@@ -19,17 +19,17 @@
   <meta name="author" content="FHK_KMD6377">
   <meta name="keywords" content="">
   
-    <meta name="description" content="进程,地址空间,线程由于计算机所拥有的物理资源有限，当多个程序在计算机上同时运行时，它们不可能连续地在处理器上运行或占用全部内存，因此我们需要进程的抽象在用户的一侧隐藏上下文切换等细节。  进程作为运行的程序的抽象，包含了一个程序的运行状态和这个程序所用的抽象内存及其中存储的数据。 我们将一个进程可以使用的全部内存的地址和它们存储的数据，称为这个进程的 地址空间（address space） 进程">
+    <meta name="description" content="有关Linux子进程进程,地址空间,线程由于计算机所拥有的物理资源有限，当多个程序在计算机上同时运行时，它们不可能连续地在处理器上运行或占用全部内存，因此我们需要进程的抽象在用户的一侧隐藏上下文切换等细节。  进程作为运行的程序的抽象，包含了一个程序的运行状态和这个程序所用的抽象内存及其中存储的数据。 我们将一个进程可以使用的全部内存的地址和它们存储的数据，称为这个进程的 地址空间（address">
 <meta property="og:type" content="article">
 <meta property="og:title" content="FHK_KMD终晨">
 <meta property="og:url" content="http://example.com/2024/09/23/%E6%9C%89%E5%85%B3Linux%E5%AD%90%E8%BF%9B%E7%A8%8B/index.html">
 <meta property="og:site_name" content="FHK_KMD终晨">
-<meta property="og:description" content="进程,地址空间,线程由于计算机所拥有的物理资源有限，当多个程序在计算机上同时运行时，它们不可能连续地在处理器上运行或占用全部内存，因此我们需要进程的抽象在用户的一侧隐藏上下文切换等细节。  进程作为运行的程序的抽象，包含了一个程序的运行状态和这个程序所用的抽象内存及其中存储的数据。 我们将一个进程可以使用的全部内存的地址和它们存储的数据，称为这个进程的 地址空间（address space） 进程">
+<meta property="og:description" content="有关Linux子进程进程,地址空间,线程由于计算机所拥有的物理资源有限，当多个程序在计算机上同时运行时，它们不可能连续地在处理器上运行或占用全部内存，因此我们需要进程的抽象在用户的一侧隐藏上下文切换等细节。  进程作为运行的程序的抽象，包含了一个程序的运行状态和这个程序所用的抽象内存及其中存储的数据。 我们将一个进程可以使用的全部内存的地址和它们存储的数据，称为这个进程的 地址空间（address">
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/images/d623ba5f1e352fe303ada7d6e4554aa74cc59e8f.png">
 <meta property="og:image" content="http://example.com/images/b49f9d2d90d601cb3ff832695ce1727592adba5b.png">
 <meta property="article:published_time" content="2024-09-23T13:14:11.555Z">
-<meta property="article:modified_time" content="2024-09-23T13:14:11.555Z">
+<meta property="article:modified_time" content="2024-09-25T04:19:36.779Z">
 <meta property="article:author" content="FHK_KMD6377">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/images/d623ba5f1e352fe303ada7d6e4554aa74cc59e8f.png">
@@ -278,7 +278,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="进程-地址空间-线程"><a href="#进程-地址空间-线程" class="headerlink" title="进程,地址空间,线程"></a>进程,地址空间,线程</h2><p>由于计算机所拥有的物理资源有限，当多个程序在计算机上同时运行时，它们不可能连续地在处理器上运行或占用全部内存，因此我们需要进程的抽象在用户的一侧隐藏上下文切换等细节。</p>
+                <h1 id="有关Linux子进程"><a href="#有关Linux子进程" class="headerlink" title="有关Linux子进程"></a>有关Linux子进程</h1><h2 id="进程-地址空间-线程"><a href="#进程-地址空间-线程" class="headerlink" title="进程,地址空间,线程"></a>进程,地址空间,线程</h2><p>由于计算机所拥有的物理资源有限，当多个程序在计算机上同时运行时，它们不可能连续地在处理器上运行或占用全部内存，因此我们需要进程的抽象在用户的一侧隐藏上下文切换等细节。</p>
 <ul>
 <li>进程作为运行的程序的抽象，包含了一个程序的运行状态和这个程序所用的抽象内存及其中存储的数据。</li>
 <li>我们将一个进程可以使用的全部内存的地址和它们存储的数据，称为这个进程的 <strong>地址空间（address space）</strong></li>
